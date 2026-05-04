@@ -1,0 +1,14 @@
+# Disable script execution
+
+<FilesMatch "\.(php|php3|php4|php5|phtml|exe|sh|pl|py|cgi)$">
+Order Deny,Allow
+Deny from all
+</FilesMatch>
+
+# Prevent viewing directory index
+
+Options -Indexes
+
+# Set memory limit and other PHP flags if server allows
+
+# php_flag engine off
