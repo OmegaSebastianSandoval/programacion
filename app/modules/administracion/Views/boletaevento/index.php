@@ -1,6 +1,7 @@
 <h1 class="titulo-principal"><i class="fas fa-cogs"></i> <?php echo $this->titlesection; ?></h1>
 <div class="container-fluid">
-	<form action="<?php echo $this->route . "?boleta_evento_evento=" . $this->boleta_evento_evento . ""; ?>" method="post">
+	<form action="<?php echo $this->route . "?boleta_evento_evento=" . $this->boleta_evento_evento . ""; ?>"
+		method="post">
 		<div class="content-dashboard">
 			<div class="row">
 				<div class="col-3">
@@ -131,9 +132,13 @@
 					</select>
 				</div>
 				<div class="col-3">
-					<div class="text-end"><a class="btn btn-sm btn-success"
-							href="<?php echo $this->route . "\manage" . "?boleta_evento_evento=" . $this->boleta_evento_evento . ""; ?>"> <i
-								class="fas fa-plus-square"></i> Crear Nuevo</a></div>
+					<div class="text-end d-flex justify-content-end gap-2">
+						<a class="btn btn-sm btn-secondary" href="/administracion/eventos">
+							<i class="fas fa-arrow-left"></i> Volver a Eventos</a>
+						<a class="btn btn-sm btn-success"
+							href="<?php echo $this->route . "\manage" . "?boleta_evento_evento=" . $this->boleta_evento_evento . ""; ?>">
+							<i class="fas fa-plus-square"></i> Crear Nuevo</a>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -143,8 +148,10 @@
 					<tr>
 						<td>Tipo evento</td>
 						<td>Cantidad</td>
-						<td>boleta_evento_evento</td>
+						<td>Vendidas</td>
+						<td>Evento</td>
 						<td>Precio</td>
+						<td>Valor adicional(Precio reserva)</td>
 						<td>Fecha l&iacute;mite</td>
 						<td width="150"></td>
 					</tr>
@@ -155,12 +162,14 @@
 						<tr>
 							<td><?= $this->list_boleta_evento_tipo[$content->boleta_evento_tipo]; ?>
 							<td><?= $content->boleta_evento_cantidad; ?></td>
+							<td><?= (int) $content->boleta_evento_cantidad_vendidas; ?></td>
 							<td><?= $this->list_evento[$content->boleta_evento_evento] ?></td>
 							<td><?= $content->boleta_evento_precio; ?></td>
+							<td><?= $content->boleta_evento_precioadicional; ?></td>
 							<td><?= $content->boleta_evento_fechalimite; ?></td>
 							<td class="text-end">
 								<div>
-									<a class="btn btn-azul btn-sm" href="<?php echo $this->route; ?>/manage?id=<?= $id ?>"
+									<a class="btn btn-azul btn-sm" href="<?php echo $this->route; ?>/manage?id=<?= $id ?>&boleta_evento_evento=<?= $this->boleta_evento_evento; ?>"
 										data-bs-toggle="tooltip" data-bs-placement="top" title="Editar"><i class="fas fa-pen-alt"></i></a>
 									<span data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar"><a class="btn btn-rojo btn-sm"
 											data-bs-toggle="modal" data-bs-target="#modal<?= $id ?>"><i class="fas fa-trash-alt"></i></a></span>

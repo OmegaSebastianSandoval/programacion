@@ -330,9 +330,20 @@
       modalBody.innerHTML = body;
 
       const detalleUrl = '/page/evento/detalle?id=' + ev.id + (vendedor ? '&vendedor=' + encodeURIComponent(vendedor) : '');
+      let btnIcon, btnText;
+      if (ev.tipo === 'reserva') {
+        btnIcon = 'fas fa-calendar-check';
+        btnText = 'Más información / Reservas';
+      } else if (ev.tiene_boletas) {
+        btnIcon = 'fas fa-ticket-alt';
+        btnText = 'Más información / Comprar';
+      } else {
+        btnIcon = 'fas fa-info-circle';
+        btnText = 'Más información';
+      }
       document.getElementById('calEventModalFooter').innerHTML =
         `<a href="${detalleUrl}" class="btn-detalle-evento w-100">` +
-        `<i class="fas fa-ticket-alt me-2"></i>Más información / Comprar</a>`;
+        `<i class="${btnIcon} me-2"></i>${btnText}</a>`;
 
       bsModal.show();
     }

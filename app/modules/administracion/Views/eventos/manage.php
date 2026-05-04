@@ -67,19 +67,19 @@
 					<?php } ?>
 				</div>
 				<?php /* COSTO — ahora viene de otra fuente; campos deshabilitados temporalmente
-				<div class="col-12 col-lg-3 form-group">
-					<label for="evento_costo_display" class="control-label">Costo</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="hidden" name="evento_costo" id="evento_costo" value="<?= $this->content->evento_costo; ?>">
-						<input type="text" id="evento_costo_display" class="form-control" required placeholder="$ 0"
-							value="<?= $this->content->evento_costo ? '$ ' . number_format((float)$this->content->evento_costo, 0, ',', '.') : ''; ?>">
-					</label>
-					<div class="help-block with-errors"></div>
-				</div>
-				*/ ?>
+			 <div class="col-12 col-lg-3 form-group">
+				 <label for="evento_costo_display" class="control-label">Costo</label>
+				 <label class="input-group">
+					 <div class="input-group-prepend">
+						 <span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
+					 </div>
+					 <input type="hidden" name="evento_costo" id="evento_costo" value="<?= $this->content->evento_costo; ?>">
+					 <input type="text" id="evento_costo_display" class="form-control" required placeholder="$ 0"
+						 value="<?= $this->content->evento_costo ? '$ ' . number_format((float)$this->content->evento_costo, 0, ',', '.') : ''; ?>">
+				 </label>
+				 <div class="help-block with-errors"></div>
+			 </div>
+			 */ ?>
 				<div class="col-12 col-lg-3 form-group">
 					<label for="evento_fecha" class="control-label">Fecha</label>
 					<label class="input-group">
@@ -124,7 +124,7 @@
 
 
 
-				<div class="col-12 col-lg-2 form-group">
+				<div class="col-12 col-lg-3 form-group">
 					<label class="control-label">Estado</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
@@ -134,8 +134,10 @@
 						<input type="hidden" name="evento_estado" value="<?= $estadoActual ?>">
 						<select class="form-control" disabled>
 							<?php foreach ($this->list_evento_estado as $key => $value) { ?>
-								<option <?php if ($estadoActual == $key) { echo "selected"; } ?>
-									value="<?php echo $key; ?>"><?= $value; ?></option>
+								<option <?php if ($estadoActual == $key) {
+									echo "selected";
+								} ?> value="<?php echo $key; ?>"><?= $value; ?>
+								</option>
 							<?php } ?>
 						</select>
 					</label>
@@ -152,7 +154,7 @@
 					</label>
 					<div class="help-block with-errors"></div>
 				</div>
-				<div class="col-12 col-lg-2 form-group">
+				<!-- <div class="col-12 col-lg-2 form-group">
 					<label for="evento_porcentaje_pagoinicial" class="control-label">Porcentaje pago inicial</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
@@ -163,7 +165,7 @@
 							class="form-control">
 					</label>
 					<div class="help-block with-errors"></div>
-				</div>
+				</div> -->
 				<div class="col-12 form-group">
 					<label for="evento_descripcion" class="form-label">Descripci&oacute;n</label>
 					<textarea name="evento_descripcion" id="evento_descripcion" class="form-control tinyeditor"
@@ -197,48 +199,48 @@
 	</form>
 </div>
 <script>
-(function () {
-	// const costoHidden = document.getElementById('evento_costo');   // costo viene de otra fuente
-	// const costoDisplay = document.getElementById('evento_costo_display');
-	const lugarSelect = document.getElementById('evento_lugar');
-	const aforoInput = document.getElementById('evento_aforomaximo');
-	const afoRoute = '<?php echo $this->route; ?>/getaforo';
+	(function () {
+		// const costoHidden = document.getElementById('evento_costo');   // costo viene de otra fuente
+		// const costoDisplay = document.getElementById('evento_costo_display');
+		const lugarSelect = document.getElementById('evento_lugar');
+		const aforoInput = document.getElementById('evento_aforomaximo');
+		const afoRoute = '<?php echo $this->route; ?>/getaforo';
 
-	// function formatCOP(value) { ... }           // costo viene de otra fuente
-	// costoDisplay.addEventListener('input', ...)
-	// costoDisplay.closest('form').addEventListener('submit', ...)
+		// function formatCOP(value) { ... }           // costo viene de otra fuente
+		// costoDisplay.addEventListener('input', ...)
+		// costoDisplay.closest('form').addEventListener('submit', ...)
 
-	function fetchAforo(sedeId) {
-		if (!sedeId) return;
-		fetch(afoRoute + '?sede_id=' + encodeURIComponent(sedeId))
-			.then(r => r.json())
-			.then(data => {
-				const aforo = data.sede_aforo || 0;
-				aforoInput.value = aforo;
-				aforoInput.max = aforo;
-			});
-	}
+		function fetchAforo (sedeId) {
+			if (!sedeId) return;
+			fetch(afoRoute + '?sede_id=' + encodeURIComponent(sedeId))
+				.then(r => r.json())
+				.then(data => {
+					const aforo = data.sede_aforo || 0;
+					aforoInput.value = aforo;
+					aforoInput.max = aforo;
+				});
+		}
 
-	const activoCheck = document.querySelector('input[name="evento_activo"]');
-	const estadoHidden = document.querySelector('input[name="evento_estado"]');
-	const estadoSelect = estadoHidden ? estadoHidden.nextElementSibling : null;
+		const activoCheck = document.querySelector('input[name="evento_activo"]');
+		const estadoHidden = document.querySelector('input[name="evento_estado"]');
+		const estadoSelect = estadoHidden ? estadoHidden.nextElementSibling : null;
 
-	function syncEstado() {
-		const estado = activoCheck.checked ? 'activo' : 'inactivo';
-		estadoHidden.value = estado;
-		if (estadoSelect) estadoSelect.value = estado;
-	}
+		function syncEstado () {
+			const estado = activoCheck.checked ? 'activo' : 'inactivo';
+			estadoHidden.value = estado;
+			if (estadoSelect) estadoSelect.value = estado;
+		}
 
-	if (activoCheck) {
-		activoCheck.addEventListener('change', syncEstado);
-	}
+		if (activoCheck) {
+			activoCheck.addEventListener('change', syncEstado);
+		}
 
-	lugarSelect.addEventListener('change', function () {
-		fetchAforo(this.value);
-	});
+		lugarSelect.addEventListener('change', function () {
+			fetchAforo(this.value);
+		});
 
-	if (lugarSelect.value) {
-		fetchAforo(lugarSelect.value);
-	}
-})();
+		if (lugarSelect.value) {
+			fetchAforo(lugarSelect.value);
+		}
+	})();
 </script>

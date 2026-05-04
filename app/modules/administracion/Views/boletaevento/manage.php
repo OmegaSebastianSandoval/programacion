@@ -21,6 +21,11 @@
 			$colorHex = $porcentaje >= 90 ? '#dc3545' : ($porcentaje >= 70 ? '#fd7e14' : '#198754');
 			$bgLight = $porcentaje >= 90 ? '#fff5f5' : ($porcentaje >= 70 ? '#fff8f0' : '#f0faf4');
 			?>
+
+			<?php
+			$tipoEvento = $this->evento->evento_tipo;
+			$fechaEvento = $this->evento->evento_fecha;
+			?>
 			<div class="mb-4 p-3 rounded-3 border"
 				style="background:<?php echo $bgLight; ?>; border-color:<?php echo $colorHex; ?>20 !important;">
 				<div class="d-flex justify-content-between align-items-center mb-2">
@@ -102,31 +107,70 @@
 				} else {
 					echo $this->boleta_evento_evento;
 				} ?>">
+				<?php if ($tipoEvento !== 'reserva') { ?>
 				<div class="col-12  col-lg-3 form-group">
-					<label for="boleta_evento_precio" class="control-label">Precio</label>
+					<label for="boleta_evento_precio_display" class="control-label">Precio</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
 						</div>
-						<input type="text" value="<?= $this->content->boleta_evento_precio; ?>" name="boleta_evento_precio"
-							id="boleta_evento_precio" class="form-control" required>
+						<input type="text"
+							id="boleta_evento_precio_display"
+							class="form-control precio-cop"
+							data-hidden="boleta_evento_precio"
+							value="<?= $this->content->boleta_evento_precio ? number_format((int)$this->content->boleta_evento_precio, 0, ',', '.') : ''; ?>"
+							required autocomplete="off">
 					</label>
+					<input type="hidden" name="boleta_evento_precio" id="boleta_evento_precio"
+						value="<?= $this->content->boleta_evento_precio; ?>">
 					<div class="help-block with-errors"></div>
 				</div>
-				<input type="hidden" name="boleta_evento_precioadicional"
-					value="<?php echo $this->content->boleta_evento_precioadicional ?>">
+				<?php } else { ?>
+				<input type="hidden" name="boleta_evento_precio" id="boleta_evento_precio" value="0">
+				<?php } ?>
+				<?php if (in_array($tipoEvento, ['reservayboleteria', 'reserva'])) { ?>
+				<div class="col-12  col-lg-3 form-group">
+					<label for="boleta_evento_precioadicional_display" class="control-label">Precio reserva <span class="text-muted">(Valor adicional)</span></label>
+					<label class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
+						</div>
+						<input type="text"
+							id="boleta_evento_precioadicional_display"
+							class="form-control precio-cop"
+							data-hidden="boleta_evento_precioadicional"
+							value="<?= $this->content->boleta_evento_precioadicional ? number_format((int)$this->content->boleta_evento_precioadicional, 0, ',', '.') : ''; ?>"
+							autocomplete="off" required>
+					</label>
+					<input type="hidden" name="boleta_evento_precioadicional" id="boleta_evento_precioadicional"
+						value="<?= $this->content->boleta_evento_precioadicional; ?>">
+					<div class="help-block with-errors"></div>
+				</div>
+				<?php } ?>
+
+				<?php if ($this->content->boleta_evento_id) { ?>
+				<div class="col-12 col-lg-3 form-group">
+					<label class="control-label">Boletas vendidas</label>
+					<label class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text input-icono"><i class="fas fa-ticket-alt"></i></span>
+						</div>
+						<input type="text" class="form-control" value="<?= (int) $this->content->boleta_evento_cantidad_vendidas; ?>" disabled>
+					</label>
+				</div>
+				<?php } ?>
 				<div class="col-12  col-lg-3 form-group">
 					<label for="boleta_evento_fechalimite" class="control-label">Fecha l&iacute;mite</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text input-icono "><i class="fas fa-calendar-alt"></i></span>
 						</div>
-						<input type="text" value="<?php if ($this->content->boleta_evento_fechalimite) {
+						<input type="datetime-local" value="<?php if ($this->content->boleta_evento_fechalimite) {
 							echo $this->content->boleta_evento_fechalimite;
 						} else {
-							echo date('Y-m-d');
-						} ?>" name="boleta_evento_fechalimite" id="boleta_evento_fechalimite" class="form-control"
-							data-provide="datepicker" data-date-format="yyyy-mm-dd" data-date-language="es">
+							echo $fechaEvento;
+						} ?>" max="<?= $fechaEvento ? date('Y-m-d', strtotime($fechaEvento)) . 'T23:59' : '' ?>"  name="boleta_evento_fechalimite" id="boleta_evento_fechalimite" class="form-control"
+							>
 					</label>
 					<div class="help-block with-errors"></div>
 				</div>
@@ -161,4 +205,33 @@
 			if (fb) fb.textContent = '';
 		}
 	}
+
+	function formatearCOP (valor) {
+		var num = String(valor).replace(/\D/g, '');
+		if (!num) return '';
+		return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+	}
+
+	document.querySelectorAll('.precio-cop').forEach(function (input) {
+		input.addEventListener('input', function () {
+			var cursor = this.selectionStart;
+			var prevLen = this.value.length;
+			var raw = this.value.replace(/\D/g, '');
+			var formatted = formatearCOP(raw);
+			this.value = formatted;
+			// ajustar cursor por los puntos insertados
+			var diff = formatted.length - prevLen;
+			this.setSelectionRange(cursor + diff, cursor + diff);
+			// actualizar hidden
+			var hidden = document.getElementById(this.getAttribute('data-hidden'));
+			if (hidden) hidden.value = raw;
+		});
+	});
+
+	document.querySelector('form').addEventListener('submit', function () {
+		document.querySelectorAll('.precio-cop').forEach(function (input) {
+			var hidden = document.getElementById(input.getAttribute('data-hidden'));
+			if (hidden) hidden.value = input.value.replace(/\D/g, '');
+		});
+	});
 </script>

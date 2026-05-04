@@ -120,7 +120,7 @@
 							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
 						</div>
 						<input type="datetime-local" value="<?= $this->content->fecha; ?>" name="fecha" id="fecha"
-							class="form-control" min="<?= date('Y-m-d\TH:i') ?>">
+							class="form-control" min="<?= date('Y-m-d H:i:s') ?>">
 					</label>
 					<div class="help-block with-errors"></div>
 				</div>

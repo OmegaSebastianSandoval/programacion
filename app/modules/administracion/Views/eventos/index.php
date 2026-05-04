@@ -2,7 +2,8 @@
 <div class="container-fluid">
 	<form action="<?php echo $this->route; ?>" method="post">
 		<div class="content-dashboard">
-			<div class="row">
+			<!-- Fila 1 -->
+				<div class="row mb-2">
 				<div class="col-3">
 					<label>Tipo</label>
 					<label class="input-group">
@@ -26,37 +27,7 @@
 							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
 						</div>
 						<input type="text" class="form-control" name="evento_nombre"
-							value="<?php echo $this->getObjectVariable($this->filters, 'evento_nombre') ?>"></input>
-					</label>
-				</div>
-				<div class="col-3">
-					<label>Imagen</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text" class="form-control" name="evento_imagen"
-							value="<?php echo $this->getObjectVariable($this->filters, 'evento_imagen') ?>"></input>
-					</label>
-				</div>
-				<div class="col-3">
-					<label>Costo</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text" class="form-control" name="evento_costo"
-							value="<?php echo $this->getObjectVariable($this->filters, 'evento_costo') ?>"></input>
-					</label>
-				</div>
-				<div class="col-3">
-					<label>Fecha</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text" class="form-control" name="evento_fecha"
-							value="<?php echo $this->getObjectVariable($this->filters, 'evento_fecha') ?>"></input>
+							value="<?php echo $this->getObjectVariable($this->filters, 'evento_nombre') ?>">
 					</label>
 				</div>
 				<div class="col-3">
@@ -76,26 +47,6 @@
 					</label>
 				</div>
 				<div class="col-3">
-					<label>&iquest;Es bono?</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text" class="form-control" name="evento_bono"
-							value="<?php echo $this->getObjectVariable($this->filters, 'evento_bono') ?>"></input>
-					</label>
-				</div>
-				<div class="col-3">
-					<label>&iquest;Est&aacute; activo?</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text" class="form-control" name="evento_activo"
-							value="<?php echo $this->getObjectVariable($this->filters, 'evento_activo') ?>"></input>
-					</label>
-				</div>
-				<div class="col-3">
 					<label>Estado</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
@@ -108,6 +59,35 @@
 										echo "selected";
 									} ?>><?= $value; ?></option>
 							<?php endforeach ?>
+						</select>
+					</label>
+				</div>
+			</div>
+			<!-- Fila 2 -->
+			<div class="row">
+				<div class="col-3">
+					<label>&iquest;Es bono?</label>
+					<label class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text input-icono "><i class="far fa-list-alt"></i></span>
+						</div>
+						<select class="form-control" name="evento_bono">
+							<option value="">Todos</option>
+							<option value="1" <?php if ($this->getObjectVariable($this->filters, 'evento_bono') === '1') echo 'selected'; ?>>Sí</option>
+							<option value="0" <?php if ($this->getObjectVariable($this->filters, 'evento_bono') === '0') echo 'selected'; ?>>No</option>
+						</select>
+					</label>
+				</div>
+				<div class="col-3">
+					<label>&iquest;Est&aacute; activo?</label>
+					<label class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text input-icono "><i class="far fa-list-alt"></i></span>
+						</div>
+						<select class="form-control" name="evento_activo">
+							<option value="">Todos</option>
+							<option value="1" <?php if ($this->getObjectVariable($this->filters, 'evento_activo') === '1') echo 'selected'; ?>>Sí</option>
+							<option value="0" <?php if ($this->getObjectVariable($this->filters, 'evento_activo') === '0') echo 'selected'; ?>>No</option>
 						</select>
 					</label>
 				</div>

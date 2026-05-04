@@ -126,7 +126,7 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 		$this->_view->csrf = Session::getInstance()->get('csrf')[$this->_csrf_section];
 		$this->_view->list_boleta_evento_tipo = $this->getBoletaeventotipo();
 		$this->_view->boleta_evento_evento = $this->_getSanitizedParam("boleta_evento_evento");
-		$this->setAforoView($this->_getSanitizedParam("boleta_evento_evento"));
+		$this->mostrarAforo($this->_getSanitizedParam("boleta_evento_evento"));
 
 		$id = $this->_getSanitizedParam("id");
 		if ($id > 0) {
@@ -135,7 +135,8 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 				$this->_view->content = $content;
 				$this->_view->routeform = $this->route . "/update";
 				$title = "Actualizar Boleta evento";
-				$this->setAforoView($content->boleta_evento_evento);
+				$this->mostrarAforo($content->boleta_evento_evento);
+
 
 			} else {
 				$this->_view->routeform = $this->route . "/insert";
@@ -149,7 +150,7 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 		$this->_view->titlesection = $title;
 	}
 
-	private function setAforoView($eventoId)
+	private function mostrarAforo($eventoId)
 	{
 		$eventoModel = new Administracion_Model_DbTable_Eventos();
 		$evento = $eventoModel->getById($eventoId);
@@ -161,9 +162,11 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 		foreach ($boletasEvento as $value) {
 			$cantidadBoletas += $value->boleta_evento_cantidad;
 		}
+		
 		$this->_view->boleta_evento_saldo = $aforoMaximo - $cantidadBoletas;
 		$this->_view->boleta_evento_aforomaximo = $aforoMaximo;
 		$this->_view->boleta_evento_cantidadactual = $cantidadBoletas;
+
 	}
 
 	/**
@@ -259,7 +262,7 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 		$data['boleta_evento_saldo'] = $this->_getSanitizedParam("boleta_evento_saldo");
 		$data['boleta_evento_evento'] = $this->_getSanitizedParamHtml("boleta_evento_evento");
 		$data['boleta_evento_precio'] = $this->_getSanitizedParam("boleta_evento_precio");
-		$data['boleta_evento_precioadicional'] = '';
+		$data['boleta_evento_precioadicional'] = $this->_getSanitizedParam("boleta_evento_precioadicional");
 		$data['boleta_evento_fechalimite'] = $this->_getSanitizedParam("boleta_evento_fechalimite");
 		$data['boleta_evento_horalimite'] = '';
 		return $data;

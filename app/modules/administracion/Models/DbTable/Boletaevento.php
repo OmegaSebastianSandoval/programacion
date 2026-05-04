@@ -30,7 +30,7 @@ class Administracion_Model_DbTable_Boletaevento extends Db_Table
 		$boleta_evento_precioadicional = $data['boleta_evento_precioadicional'];
 		$boleta_evento_fechalimite = $data['boleta_evento_fechalimite'];
 		$boleta_evento_horalimite = $data['boleta_evento_horalimite'];
-		$query = "INSERT INTO boleta_evento( boleta_evento_tipo, boleta_evento_cantidad, boleta_evento_saldo, boleta_evento_evento, boleta_evento_precio, boleta_evento_precioadicional, boleta_evento_fechalimite, boleta_evento_horalimite) VALUES ( '$boleta_evento_tipo', '$boleta_evento_cantidad', '$boleta_evento_saldo', '$boleta_evento_evento', '$boleta_evento_precio', '$boleta_evento_precioadicional', '$boleta_evento_fechalimite', '$boleta_evento_horalimite')";
+		$query = "INSERT INTO boleta_evento( boleta_evento_tipo, boleta_evento_cantidad, boleta_evento_saldo, boleta_evento_evento, boleta_evento_precio, boleta_evento_precioadicional, boleta_evento_fechalimite, boleta_evento_horalimite, boleta_evento_cantidad_vendidas) VALUES ( '$boleta_evento_tipo', '$boleta_evento_cantidad', '$boleta_evento_saldo', '$boleta_evento_evento', '$boleta_evento_precio', '$boleta_evento_precioadicional', '$boleta_evento_fechalimite', '$boleta_evento_horalimite', '0')";
 		$res = $this->_conn->query($query);
         return mysqli_insert_id($this->_conn->getConnection());
 	}
