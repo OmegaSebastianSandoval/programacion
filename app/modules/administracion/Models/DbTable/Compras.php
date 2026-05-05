@@ -86,12 +86,14 @@ class Administracion_Model_DbTable_Compras extends Db_Table
 		}
 	}
 
-	public function getVentaInfo($id)
+	public function updateRaw($id, $raw)
 	{
-		$stmt = "
-       
-    ";
-		$res = $this->_conn->query($stmt)->fetchAsObject();
-		return $res[0];
+		if ($id != "") {
+			$raw = mysqli_real_escape_string($this->_conn->getConnection(), $raw);
+			$query = "UPDATE boleta_compra SET boleta_compra_raw = '$raw' WHERE boleta_compra_id = '$id'";
+			$this->_conn->query($query);
+		}
 	}
+
+
 }

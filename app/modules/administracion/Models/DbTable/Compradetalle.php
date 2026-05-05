@@ -24,11 +24,12 @@ class Administracion_Model_DbTable_Compradetalle extends Db_Table
 	public function insert($data){
 		$detalle_compra = $data['detalle_compra'];
 		$detalle_boleta = $data['detalle_boleta'];
+		$detalle_boleta_nombre = $data['detalle_boleta_nombre'];
 		$detalle_cantidad = $data['detalle_cantidad'];
 		$detalle_precio_unit = $data['detalle_precio_unit'];
 		$detalle_precio_reserva = $data['detalle_precio_reserva'];
 		$detalle_subtotal = $data['detalle_subtotal'];
-		$query = "INSERT INTO boleta_compra_detalle( detalle_compra, detalle_boleta, detalle_cantidad, detalle_precio_unit, detalle_precio_reserva, detalle_subtotal) VALUES ( '$detalle_compra', '$detalle_boleta', '$detalle_cantidad', '$detalle_precio_unit', '$detalle_precio_reserva', '$detalle_subtotal')";
+		$query = "INSERT INTO boleta_compra_detalle( detalle_compra, detalle_boleta, detalle_boleta_nombre, detalle_cantidad, detalle_precio_unit, detalle_precio_reserva, detalle_subtotal) VALUES ( '$detalle_compra', '$detalle_boleta', '$detalle_boleta_nombre', '$detalle_cantidad', '$detalle_precio_unit', '$detalle_precio_reserva', '$detalle_subtotal')";
 		$res = $this->_conn->query($query);
         return mysqli_insert_id($this->_conn->getConnection());
 	}
@@ -47,7 +48,8 @@ class Administracion_Model_DbTable_Compradetalle extends Db_Table
 		$detalle_precio_unit = $data['detalle_precio_unit'];
 		$detalle_precio_reserva = $data['detalle_precio_reserva'];
 		$detalle_subtotal = $data['detalle_subtotal'];
-		$query = "UPDATE boleta_compra_detalle SET  detalle_compra = '$detalle_compra', detalle_boleta = '$detalle_boleta', detalle_cantidad = '$detalle_cantidad', detalle_precio_unit = '$detalle_precio_unit', detalle_precio_reserva = '$detalle_precio_reserva', detalle_subtotal = '$detalle_subtotal' WHERE detalle_id = '".$id."'";
+		$detalle_boleta_nombre = $data['detalle_boleta_nombre'];
+		$query = "UPDATE boleta_compra_detalle SET  detalle_compra = '$detalle_compra', detalle_boleta = '$detalle_boleta', detalle_boleta_nombre = '$detalle_boleta_nombre', detalle_cantidad = '$detalle_cantidad', detalle_precio_unit = '$detalle_precio_unit', detalle_precio_reserva = '$detalle_precio_reserva', detalle_subtotal = '$detalle_subtotal' WHERE detalle_id = '".$id."'";
 		$res = $this->_conn->query($query);
 	}
 }

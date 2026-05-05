@@ -179,7 +179,7 @@ class Page_eventoController extends Page_mainController
 
       $totalCalculado += ($precioUnit + $precioReserva) * $cantidad;
       $cantidadTotal += $cantidad;
-      $resumen[] = ['boleta' => $boleta, 'cantidad' => $cantidad, 'precioUnit' => $precioUnit, 'precioReserva' => $precioReserva];
+      $resumen[] = ['boleta' => $boleta, 'cantidad' => $cantidad, 'precioUnit' => $precioUnit, 'precioReserva' => $precioReserva, 'tipo_id' => (int) $boleta->boleta_evento_tipo];
     }
 
     if (empty($resumen)) {
@@ -237,11 +237,19 @@ class Page_eventoController extends Page_mainController
     $dataCompra['boleta_compra_vendedor'] = $vendedor;
     $idCompra = $comprasModel->insert($dataCompra);
 
+    $boletatipoModel = new Administracion_Model_DbTable_Boletatipo();
+    $tiposRaw = $boletatipoModel->getList();
+    $tipoMap = [];
+    foreach ($tiposRaw as $t) {
+      $tipoMap[(int) $t->boleta_tipo_id] = $t->boleta_tipo_nombre;
+    }
 
     foreach ($resumen as $item) {
+
       $detalleData = [];
       $detalleData['detalle_compra'] = $idCompra;
       $detalleData['detalle_boleta'] = $item['boleta']->boleta_evento_id;
+      $detalleData['detalle_boleta_nombre'] = $tipoMap[$item['tipo_id']] ?? 'Boleta';
       $detalleData['detalle_cantidad'] = $item['cantidad'];
       $detalleData['detalle_precio_unit'] = $item['precioUnit'];
       $detalleData['detalle_precio_reserva'] = $item['precioReserva'];
@@ -428,6 +436,12 @@ class Page_eventoController extends Page_mainController
     //Validamos la firma
     if ($x_signature == $signature) {
 
+      $idCompraRaw = (int) ($_REQUEST['x_extra1'] ?? 0);
+      if ($idCompraRaw) {
+        $rawData = json_encode($_REQUEST, JSON_UNESCAPED_UNICODE);
+        $comprasModel->updateRaw($idCompraRaw, $rawData);
+      }
+
       $x_cod_response = $_REQUEST['x_cod_response'];
       switch ((int) $x_cod_response) {
         case 1:
@@ -566,47 +580,145 @@ class Page_eventoController extends Page_mainController
     $logModel = new Administracion_Model_DbTable_Log();
     $logModel->insert($data2);
   }
+  public function enviarboleteriaAction()
+  {
+    $idCompra = 1;
+    $this->setLayout('blanco');
+    $comprasModel = new Administracion_Model_DbTable_Compras();
+    $ticketsModel = new Administracion_Model_DbTable_Tickets();
+    $infoVenta = $this->getVentaInfo($idCompra);
+    // echo "<pre>";
+    // print_r($infoVenta);
+    // echo "</pre>";
 
+    $cantidad = array_reduce($infoVenta->detalle, function ($sum, $item) {
+      return $sum + (int) $item->detalle_cantidad;
+    }, 0);
+    $compraId = $infoVenta->compra->boleta_compra_id;
+    $evento = $infoVenta->boleta_compra_evento;
+
+    //validar que ya no se hayan creado los tickets
+    $ticketsExisten = $ticketsModel->getList("ticket_compra_id = '$compraId' AND ticket_evento_id = '$evento'");
+    if ($ticketsExisten && count($ticketsExisten) == $cantidad) {
+      $logModel = new Administracion_Model_DbTable_Log();
+      $dataLog = array();
+      $dataLog['log_log'] = print_r($ticketsExisten, true);
+      $dataLog['log_tipo'] = "QR NO GENERADOS PARA LA COMPRA $compraId PORQUE YA EXISTEN";
+      $logModel->insert($dataLog);
+      return;
+    }
+    $fechaEventoFinal = strtotime("$infoVenta->evento_fecha + 1 day");
+    $qrsGenerados = [];
+
+    // Iterar desde 1 hasta la cantidad de boletos comprados
+    for ($i = 1; $i <= $cantidad; $i++) {
+
+      $dataTicket = [
+        "ticket_compra_id" => $compraId,
+        "ticket_numero_ticket" => $i,
+        "ticket_estado" => 1,
+        "ticket_fecha_creacion" => date("Y-m-d H:i:s"),
+        "ticket_fecha_expiracion" => date("Y-m-d H:i:s", $fechaEventoFinal)
+      ];
+
+      $nextId = $ticketsModel->getNextTicketId();
+      $id = $ticketsModel->insert($dataTicket);
+      $token = base_convert($id, 10, 36);
+      $yearMonth = date("Ym", strtotime($infoVenta->evento_fecha));
+      $customUid = "T-{$yearMonth}-" . str_pad($nextId, 7, "0", STR_PAD_LEFT);
+      $baseString = "{$compraId}-{$infoVenta->boleta_compra_email}-{$yearMonth}-{$nextId}";
+      $token = substr(base_convert(hash('sha256', $baseString), 16, 36), 0, 12);
+      $ticketsModel->editField($id, "ticket_uid ", $customUid);
+      $ticketsModel->editField($id, "ticket_token", $token);
+      $ticketsModel->editField($id, "ticket_evento_id", $infoVenta->boleta_evento_evento);
+      $ticket = $ticketsModel->getById($id);
+
+      $qrsGenerados[] = [
+        "ticket_id" => $id,
+        "ticket_uid" => $customUid,
+        "ticket_token" => $token,
+        "ticket_numero_ticket" => $i,
+        "ticket_fecha_expiracion" => date("Y-m-d H:i:s", $fechaEventoFinal),
+        "rutaQR" => $this->generarQR($customUid, $token),
+        "email" => $infoVenta->boleta_compra_email,
+        "nombre" => $infoVenta->boleta_compra_nombre,
+        "telefono" => $infoVenta->boleta_compra_telefono,
+        "estado" => $ticket->ticket_estado,
+      ];
+
+      $this->generarpdfs($infoVenta, $ticket);
+
+    }
+
+  }
+  public function getVentaInfo($idCompra)
+  {
+    if (!$idCompra) {
+      return null;
+    }
+    $comprasModel = new Administracion_Model_DbTable_Compras();
+    $eventoModel = new Administracion_Model_DbTable_Eventos();
+    $compraDetalle = new Administracion_Model_DbTable_Compradetalle();
+    $compra = $comprasModel->getById($idCompra);
+    $detalleVenta = $compraDetalle->getList("detalle_compra = '{$idCompra}'");
+    $evento = $eventoModel->getById($compra->boleta_compra_evento);
+    $evento->evento_descripcion = null;
+    $evento->evento_titulo_politica = null;
+    $evento->evento_descripcion_politica = null;
+
+    return (object) [
+      'compra' => $compra,
+      'evento' => $evento,
+      'detalle' => $detalleVenta,
+    ];
+
+
+  }
   public function generarpdfs($infoVenta, $ticket)
-	{
-		$this->setLayout('blanco');
-		$this->_view->ticket = $ticket;
-		$this->_view->infoVenta = $infoVenta;
+  {
+    $this->setLayout('blanco');
+    $this->_view->ticket = $ticket;
+    $this->_view->infoVenta = $infoVenta;
 
-		$options = new Options();
-		$options->set('isHtml5ParserEnabled', true);
-		$options->set('isRemoteEnabled', true);
-		$options->set('isPhpEnabled', false);
-		$options->set('defaultFont', 'helvetica');
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+    $options->set('isPhpEnabled', false);
+    $options->set('defaultFont', 'helvetica');
 
-		$dompdf = new Dompdf($options);
+    $dompdf = new Dompdf($options);
 
-		$content  = $this->_view->getRoutPHP('modules/page/Views/template/generarpdf.php');
+    $content = $this->_view->getRoutPHP('modules/page/Views/template/generarpdf.php');
 
-		if ($infoVenta->programacion_bono == 1) {
-			$terminos = $this->_view->getRoutPHP('modules/page/Views/template/terminosbonos.php');
-		} else {
-			$terminos = $this->_view->getRoutPHP('modules/page/Views/template/terminos.php');
-		}
+    if ($infoVenta->evento_bono == 1) {
+      $terminos = $this->_view->getRoutPHP('modules/page/Views/template/terminosbonos.php');
+    } else {
+      $terminos = $this->_view->getRoutPHP('modules/page/Views/template/terminos.php');
+    }
 
-		$html = '<!DOCTYPE html><html><head><meta charset="UTF-8">
+    $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">
 			<style>
 				body { margin: 0; padding: 0; font-family: helvetica, sans-serif; font-size: 12px; }
 				.page-break { page-break-before: always; }
 			</style>
 		</head><body>'
-			. $content
-			. '<div class="page-break">' . $terminos . '</div>'
-		. '</body></html>';
+      . $content
+      . '<div class="page-break">' . $terminos . '</div>'
+      . '</body></html>';
 
-		$dompdf->loadHtml($html);
-		$dompdf->setPaper('letter', 'landscape');
-		$dompdf->render();
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('letter', 'landscape');
+    $dompdf->render();
 
-		ob_clean();
-		$name = PDFS_PATH . "ticket_{$ticket->ticket_uid}.pdf";
-		file_put_contents($name, $dompdf->output());
-	}
+    ob_clean();
+    $name = PDFS_PATH . "ticket_{$ticket->ticket_uid}.pdf";
+    file_put_contents($name, $dompdf->output());
+  }
 }
 
 // https://rdbd9vcd-8043.use2.devtunnels.ms/page/evento/respuesta?ref_payco=b55e48c797674450e476881e
+// {
+// header_code:"502",
+// body:"Server error: `GET https://rdbd9vcd-8043.use2.devtunnels.ms/page/evento/confirmacion?x_cust_id_cliente=1264217&x_ref_payco=364251404&x_id_factura=1&x_id_invoice=1&x_description=Compra%203%20boleta%28s%29%20%C3%A2%C2%80%C2%94%20Test%20reserva%20y%20boleteria&x_amount=106000&x_amount_country=106000&x_amount_ok=106000&x_tax=0&x_amount_base=0&x_currency_code=COP&x_bank_name=BANCO%20DE%20PRUEBAS&x_cardnumber=457562%2A%2A%2A%2A%2A%2A%2A0326&x_quotas=1&x_respuesta=Rechazada&x_response=Rechazada&x_approval_code=000000&x_transaction_id=364251404&x_fecha_transaccion=2026-05-05%2016%3A36%3A14&x_transaction_date=2026-05-05%2016%3A36%3A14&x_cod_respuesta=2&x_cod_response=2&x_response_reason_text=04-Tarjeta%20restringida%20por%20el%20centro%20de%20autorizaciones&x_errorcode=04&x_cod_transaction_state=2&x_transaction_state=Rechazada&x_franchise=VS&x_payment_method=VS&x_business=Galeria%20Cafe%20Libro%20Club%20Social%20Privado%20SAS&x_customer_doctype=CC&x_customer_document=123123123&x_customer_name=Test&x_customer_lastname=nombre&x_customer_email=test%40test.com&x_customer_phone=3123123121&x_customer_movil=3123123121&x_customer_ind_pais=&x_customer_country=CO&x_customer_city=Bogota&x_customer_address=cll%202%20%2023-33&x_customer_ip=45.173.12.208&x_test_request=FALSE&x_extra1=1&x_extra2=3&x_extra3=1&x_extra4=testing123&x_extra5=&x_extra6=&x_extra7=&x_extra8=&x_extra9=&x_extra10=&x_tax_ico=0&x_payment_date=&x_signature=a02667c50d960df5d06489991833fec9489cf72c6474f4fe4ec259d76d180867&x_transaction_cycle=&is_processable=1&x_manual=1` resulted in a `502 Bad Gateway` response",
+// url:"https://rdbd9vcd-8043.use2.devtunnels.ms/page/evento/confirmacion",
+// }
