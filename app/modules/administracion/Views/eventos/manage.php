@@ -67,19 +67,19 @@
 					<?php } ?>
 				</div>
 				<?php /* COSTO — ahora viene de otra fuente; campos deshabilitados temporalmente
-			 <div class="col-12 col-lg-3 form-group">
-				 <label for="evento_costo_display" class="control-label">Costo</label>
-				 <label class="input-group">
-					 <div class="input-group-prepend">
-						 <span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-					 </div>
-					 <input type="hidden" name="evento_costo" id="evento_costo" value="<?= $this->content->evento_costo; ?>">
-					 <input type="text" id="evento_costo_display" class="form-control" required placeholder="$ 0"
-						 value="<?= $this->content->evento_costo ? '$ ' . number_format((float)$this->content->evento_costo, 0, ',', '.') : ''; ?>">
-				 </label>
-				 <div class="help-block with-errors"></div>
-			 </div>
-			 */ ?>
+		 <div class="col-12 col-lg-3 form-group">
+			 <label for="evento_costo_display" class="control-label">Costo</label>
+			 <label class="input-group">
+				 <div class="input-group-prepend">
+					 <span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
+				 </div>
+				 <input type="hidden" name="evento_costo" id="evento_costo" value="<?= $this->content->evento_costo; ?>">
+				 <input type="text" id="evento_costo_display" class="form-control" required placeholder="$ 0"
+					 value="<?= $this->content->evento_costo ? '$ ' . number_format((float)$this->content->evento_costo, 0, ',', '.') : ''; ?>">
+			 </label>
+			 <div class="help-block with-errors"></div>
+		 </div>
+		 */ ?>
 				<div class="col-12 col-lg-3 form-group">
 					<label for="evento_fecha" class="control-label">Fecha</label>
 					<label class="input-group">
@@ -189,6 +189,22 @@
 						rows="10"><?= $this->content->evento_descripcion_politica; ?></textarea>
 					<div class="help-block with-errors"></div>
 				</div>
+				<div class="col-12 col-md-6  form-group">
+					<label for="evento_descripcion_vendedores" class="form-label">Asignar vendedor</label>
+					<div class="d-flex gap-2 align-items-start">
+						<select class="form-control" name="evento_descripcion_vendedores" id="evento_descripcion_vendedores">
+							<option value="">Seleccione un vendedor</option>
+							<?php foreach ($this->list_vendedores as $key => $value) { ?>
+								<option value="<?php echo $key; ?>" <?= (isset($this->content->evento_descripcion_vendedores) && $this->content->evento_descripcion_vendedores == $key) ? 'selected' : ''; ?>><?= $value; ?>
+								</option>
+							<?php } ?>
+						</select>
+						<?php if (isset($this->content->evento_id) && $this->content->evento_id > 0): ?>
+						<a id="btn-ver-enlace-vendedor" href="#" class="btn btn-secondary text-nowrap" onclick="verEnlaceVendedor(event)">Ver enlace</a>
+						<?php endif; ?>
+					</div>
+					<div class="help-block with-errors"></div>
+				</div>
 			</div>
 		</div>
 		<input type="hidden" name="evento_cupo" id="evento_cupo" value="<?= $this->content->evento_cupo; ?>">
@@ -243,4 +259,15 @@
 			fetchAforo(lugarSelect.value);
 		}
 	})();
+
+	function verEnlaceVendedor(e) {
+		e.preventDefault();
+		const vendedor = document.getElementById('evento_descripcion_vendedores').value;
+		if (!vendedor) {
+			alert('Seleccione un vendedor primero.');
+			return;
+		}
+		const eventoId = <?= isset($this->content->evento_id) ? (int)$this->content->evento_id : 0; ?>;
+		window.location.href = '<?= $this->route; ?>/enlacevendedor?id=' + eventoId + '&vendedor=' + encodeURIComponent(vendedor);
+	}
 </script>

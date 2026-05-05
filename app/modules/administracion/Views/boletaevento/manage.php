@@ -108,56 +108,54 @@
 					echo $this->boleta_evento_evento;
 				} ?>">
 				<?php if ($tipoEvento !== 'reserva') { ?>
-				<div class="col-12  col-lg-3 form-group">
-					<label for="boleta_evento_precio_display" class="control-label">Precio</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text"
-							id="boleta_evento_precio_display"
-							class="form-control precio-cop"
-							data-hidden="boleta_evento_precio"
-							value="<?= $this->content->boleta_evento_precio ? number_format((int)$this->content->boleta_evento_precio, 0, ',', '.') : ''; ?>"
-							required autocomplete="off">
-					</label>
-					<input type="hidden" name="boleta_evento_precio" id="boleta_evento_precio"
-						value="<?= $this->content->boleta_evento_precio; ?>">
-					<div class="help-block with-errors"></div>
-				</div>
+					<div class="col-12  col-lg-3 form-group">
+						<label for="boleta_evento_precio_display" class="control-label">Precio</label>
+						<label class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
+							</div>
+							<input type="text" id="boleta_evento_precio_display" class="form-control precio-cop"
+								data-hidden="boleta_evento_precio"
+								value="<?= $this->content->boleta_evento_precio ? number_format((int) $this->content->boleta_evento_precio, 0, ',', '.') : ''; ?>"
+								required autocomplete="off">
+						</label>
+						<input type="hidden" name="boleta_evento_precio" id="boleta_evento_precio"
+							value="<?= $this->content->boleta_evento_precio; ?>">
+						<div class="help-block with-errors"></div>
+					</div>
 				<?php } else { ?>
-				<input type="hidden" name="boleta_evento_precio" id="boleta_evento_precio" value="0">
+					<input type="hidden" name="boleta_evento_precio" id="boleta_evento_precio" value="0">
 				<?php } ?>
 				<?php if (in_array($tipoEvento, ['reservayboleteria', 'reserva'])) { ?>
-				<div class="col-12  col-lg-3 form-group">
-					<label for="boleta_evento_precioadicional_display" class="control-label">Precio reserva <span class="text-muted">(Valor adicional)</span></label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
-						</div>
-						<input type="text"
-							id="boleta_evento_precioadicional_display"
-							class="form-control precio-cop"
-							data-hidden="boleta_evento_precioadicional"
-							value="<?= $this->content->boleta_evento_precioadicional ? number_format((int)$this->content->boleta_evento_precioadicional, 0, ',', '.') : ''; ?>"
-							autocomplete="off" required>
-					</label>
-					<input type="hidden" name="boleta_evento_precioadicional" id="boleta_evento_precioadicional"
-						value="<?= $this->content->boleta_evento_precioadicional; ?>">
-					<div class="help-block with-errors"></div>
-				</div>
+					<div class="col-12  col-lg-3 form-group">
+						<label for="boleta_evento_precioreserva_display" class="control-label">Precio reserva <span
+								class="text-muted">(Valor adicional)</span></label>
+						<label class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
+							</div>
+							<input type="text" id="boleta_evento_precioreserva_display" class="form-control precio-cop"
+								data-hidden="boleta_evento_precioreserva"
+								value="<?= $this->content->boleta_evento_precioreserva ? number_format((int) $this->content->boleta_evento_precioreserva, 0, ',', '.') : ''; ?>"
+								autocomplete="off" required>
+						</label>
+						<input type="hidden" name="boleta_evento_precioreserva" id="boleta_evento_precioreserva"
+							value="<?= $this->content->boleta_evento_precioreserva; ?>">
+						<div class="help-block with-errors"></div>
+					</div>
 				<?php } ?>
 
 				<?php if ($this->content->boleta_evento_id) { ?>
-				<div class="col-12 col-lg-3 form-group">
-					<label class="control-label">Boletas vendidas</label>
-					<label class="input-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text input-icono"><i class="fas fa-ticket-alt"></i></span>
-						</div>
-						<input type="text" class="form-control" value="<?= (int) $this->content->boleta_evento_cantidad_vendidas; ?>" disabled>
-					</label>
-				</div>
+					<div class="col-12 col-lg-3 form-group">
+						<label class="control-label">Boletas vendidas</label>
+						<label class="input-group">
+							<div class="input-group-prepend">
+								<span class="input-group-text input-icono"><i class="fas fa-ticket-alt"></i></span>
+							</div>
+							<input type="text" class="form-control"
+								value="<?= (int) $this->content->boleta_evento_cantidad_vendidas; ?>" disabled>
+						</label>
+					</div>
 				<?php } ?>
 				<div class="col-12  col-lg-3 form-group">
 					<label for="boleta_evento_fechalimite" class="control-label">Fecha l&iacute;mite</label>
@@ -169,8 +167,8 @@
 							echo $this->content->boleta_evento_fechalimite;
 						} else {
 							echo $fechaEvento;
-						} ?>" max="<?= $fechaEvento ? date('Y-m-d', strtotime($fechaEvento)) . 'T23:59' : '' ?>"  name="boleta_evento_fechalimite" id="boleta_evento_fechalimite" class="form-control"
-							>
+						} ?>" max="<?= $fechaEvento ? date('Y-m-d', strtotime($fechaEvento)) . 'T23:59' : '' ?>"
+							name="boleta_evento_fechalimite" id="boleta_evento_fechalimite" class="form-control">
 					</label>
 					<div class="help-block with-errors"></div>
 				</div>

@@ -165,11 +165,12 @@
 							<td><?= (int) $content->boleta_evento_cantidad_vendidas; ?></td>
 							<td><?= $this->list_evento[$content->boleta_evento_evento] ?></td>
 							<td><?= $content->boleta_evento_precio; ?></td>
-							<td><?= $content->boleta_evento_precioadicional; ?></td>
+							<td><?= $content->boleta_evento_precioreserva; ?></td>
 							<td><?= $content->boleta_evento_fechalimite; ?></td>
 							<td class="text-end">
 								<div>
-									<a class="btn btn-azul btn-sm" href="<?php echo $this->route; ?>/manage?id=<?= $id ?>&boleta_evento_evento=<?= $this->boleta_evento_evento; ?>"
+									<a class="btn btn-azul btn-sm"
+										href="<?php echo $this->route; ?>/manage?id=<?= $id ?>&boleta_evento_evento=<?= $this->boleta_evento_evento; ?>"
 										data-bs-toggle="tooltip" data-bs-placement="top" title="Editar"><i class="fas fa-pen-alt"></i></a>
 									<span data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar"><a class="btn btn-rojo btn-sm"
 											data-bs-toggle="modal" data-bs-target="#modal<?= $id ?>"><i class="fas fa-trash-alt"></i></a></span>

@@ -121,6 +121,7 @@ class Administracion_eventosController extends Administracion_mainController
 		$this->_view->list_evento_tipo = $this->getEventotipo();
 		$this->_view->list_evento_lugar = $this->getEventolugar();
 		$this->_view->list_evento_estado = $this->getEventoestado();
+		$this->_view->list_vendedores = $this->getVendedores();
 		$id = $this->_getSanitizedParam("id");
 		if ($id > 0) {
 			$content = $this->mainModel->getById($id);
@@ -307,7 +308,16 @@ class Administracion_eventosController extends Administracion_mainController
 		return $array;
 	}
 
-
+private function getVendedores()
+	{
+		$modelData = new Administracion_Model_DbTable_Vendedores();
+		$data = $modelData->getList();
+		$array = array();
+		foreach ($data as $key => $value) {
+			$array[$value->id] = $value->nombre;
+		}
+		return $array;
+	}
 	/**
 	 * Genera los valores del campo Estado.
 	 *
@@ -322,6 +332,46 @@ class Administracion_eventosController extends Administracion_mainController
 		$array['cancelado'] = 'Cancelado';
 		$array['finalizado'] = 'Finalizado';
 		return $array;
+	}
+
+	/**
+	 * Muestra el enlace de vendedor para un evento con su código QR.
+	 *
+	 * @return void.
+	 */
+	public function enlacevendedorAction()
+	{
+		$id = (int)$this->_getSanitizedParam("id");
+		$vendedorId = (int)$this->_getSanitizedParam("vendedor");
+
+		$content = $this->mainModel->getById($id);
+		if (!$content || !$content->evento_id) {
+			header('Location: ' . $this->route);
+			return;
+		}
+
+		$vendedorModel = new Administracion_Model_DbTable_Vendedores();
+		$vendedores = $vendedorModel->getList();
+		$vendedorNombre = '';
+		foreach ($vendedores as $v) {
+			if ((int)$v->id === $vendedorId) {
+				$vendedorNombre = $v->nombre;
+				break;
+			}
+		}
+
+		$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+		$host = $_SERVER['HTTP_HOST'];
+		$url = $scheme . '://' . $host . '/page/evento/detalle?vendedor=' . $vendedorId . '&id=' . $id;
+
+		$title = "Enlace de vendedor — " . htmlspecialchars($content->evento_nombre);
+		$this->getLayout()->setTitle($title);
+		$this->_view->titlesection = $title;
+		$this->_view->evento = $content;
+		$this->_view->vendedor_id = $vendedorId;
+		$this->_view->vendedor_nombre = $vendedorNombre;
+		$this->_view->enlace = $url;
+		$this->_view->route = $this->route;
 	}
 
 	/**

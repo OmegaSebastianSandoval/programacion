@@ -35,7 +35,7 @@
   <script src="/components/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 
-  <script src="/components/jquery-knob/js/jquery.knob.js"></script>
+  <!-- <script src="/components/jquery-knob/js/jquery.knob.js"></script> -->
 
   <!-- SweetAlert -->
 

@@ -40,6 +40,7 @@ define('LAYOUTS_PATH', APP_PATH . 'layout' . DS);
 define('IMAGE_PATH', APP_PATH . "../public/images/");
 define('FILE_PATH', APP_PATH . "../public/files/");
 define('PUBLIC_PATH', APP_PATH . "../public/");
+define('PDFS_PATH', APP_PATH . "../public/pdfs/");
 
 date_default_timezone_set('America/Bogota');
 
@@ -147,10 +148,10 @@ register_shutdown_function(function () {
     $showDetails = (defined('APPLICATION_ENV') && APPLICATION_ENV !== 'production') || (isset($_GET['debug']) && $_GET['debug'] == '1');
 
     if ($showDetails) {
-      $message = htmlspecialchars($error['message']);
-      $file = htmlspecialchars($error['file']);
+      $message = $error['message'];
+      $file = $error['file'];
       $line = (int) $error['line'];
-      $details = "<p style='font-family:monospace'>En $file en la línea $line</p>";
+      $details = "<p style='font-family:monospace'>En " . htmlspecialchars($file) . " en la línea $line</p>";
     } else {
       $message = 'Ha ocurrido un error interno. Intente nuevamente más tarde.';
       $details = '';

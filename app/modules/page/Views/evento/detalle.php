@@ -1,7 +1,7 @@
 <?php
 $ev   = $this->evento;
 $sede = $this->sede;
-$errorMsg = isset($_GET['error']) ? htmlspecialchars(urldecode($_GET['error']), ENT_QUOTES, 'UTF-8') : '';
+$errorMsg = ($_GET['error']) ? htmlspecialchars(urldecode($_GET['error']), ENT_QUOTES, 'UTF-8') : '';
 
 $meses = [
   '',
@@ -127,18 +127,18 @@ foreach ($boletasArr as $bItem) {
       <?php endif; ?>
 
       <!-- Preview de tipos de boleta -->
-      <?php if (!empty($boletasArr)): ?>
+      <?php if (($boletasArr)): ?>
         <div class="ev-info-boletas-preview">
           <p class="ev-info-section-label"><i class="fas fa-ticket-alt me-1"></i> Boletas disponibles</p>
           <div class="ev-info-boletas-list">
             <?php foreach ($boletasArr as $bItem): ?>
-              <div class="ev-info-boleta-item<?= $bItem['saldo'] <= 0 ? ' ev-info-boleta-agotada' : '' ?>">
+              <div class="ev-info-boleta-item<?= $bItem['disponibles'] <= 0 ? ' ev-info-boleta-agotada' : '' ?>">
                 <div class="ev-info-boleta-left">
                   <span class="ev-info-boleta-nombre"><?= ($bItem['tipo_nombre']) ?></span>
-                  <?php if ($bItem['saldo'] <= 0): ?>
+                  <?php if ($bItem['disponibles'] <= 0): ?>
                     <span class="ev-badge-agotada">Agotada</span>
                   <?php else: ?>
-                    <span class="ev-info-boleta-saldo"><?= $bItem['saldo'] ?> disponibles</span>
+                    <span class="ev-info-boleta-saldo"><?= $bItem['disponibles'] ?> disponibles</span>
                   <?php endif; ?>
                 </div>
                 <div class="ev-info-boleta-precios">

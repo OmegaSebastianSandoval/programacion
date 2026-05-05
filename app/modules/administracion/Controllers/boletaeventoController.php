@@ -162,7 +162,7 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 		foreach ($boletasEvento as $value) {
 			$cantidadBoletas += $value->boleta_evento_cantidad;
 		}
-		
+
 		$this->_view->boleta_evento_saldo = $aforoMaximo - $cantidadBoletas;
 		$this->_view->boleta_evento_aforomaximo = $aforoMaximo;
 		$this->_view->boleta_evento_cantidadactual = $cantidadBoletas;
@@ -262,7 +262,7 @@ class Administracion_boletaeventoController extends Administracion_mainControlle
 		$data['boleta_evento_saldo'] = $this->_getSanitizedParam("boleta_evento_saldo");
 		$data['boleta_evento_evento'] = $this->_getSanitizedParamHtml("boleta_evento_evento");
 		$data['boleta_evento_precio'] = $this->_getSanitizedParam("boleta_evento_precio");
-		$data['boleta_evento_precioadicional'] = $this->_getSanitizedParam("boleta_evento_precioadicional");
+		$data['boleta_evento_precioreserva'] = $this->_getSanitizedParam("boleta_evento_precioreserva");
 		$data['boleta_evento_fechalimite'] = $this->_getSanitizedParam("boleta_evento_fechalimite");
 		$data['boleta_evento_horalimite'] = '';
 		return $data;

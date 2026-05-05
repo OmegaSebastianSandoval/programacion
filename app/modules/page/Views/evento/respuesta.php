@@ -1,0 +1,162 @@
+<div class="resp-page">
+	<div class="container">
+		<div class="resp-card">
+
+			<!-- Cabecera -->
+			<div class="resp-card-header">
+				<div class="resp-card-header-icon">
+					<i class="fas fa-credit-card"></i>
+				</div>
+				<div>
+					<h1 class="resp-card-header-title">Respuesta de transacción</h1>
+					<p class="resp-card-header-sub">Verificando el estado de tu pago…</p>
+				</div>
+			</div>
+
+			<!-- Estado de carga -->
+			<div class="resp-loading" id="resp-loading">
+				<div class="resp-spinner"></div>
+				<p class="resp-loading-text">Consultando la transacción con el banco…</p>
+			</div>
+
+			<!-- Contenido principal (oculto hasta que carga) -->
+			<div id="resp-content" style="display:none">
+
+				<!-- Ícono + título de estado -->
+				<div class="resp-status-block">
+					<div class="resp-status-icon" id="resp-status-icon">
+						<i id="resp-icon-i" class="fas fa-circle-notch fa-spin"></i>
+					</div>
+					<h2 class="resp-status-title" id="resp-status-title"></h2>
+					<p class="resp-status-msg" id="resp-status-msg"></p>
+				</div>
+
+				<!-- Detalle de la transacción -->
+				<div class="resp-details">
+					<div class="resp-detail-grid" id="resp-detail-grid">
+						<!-- Generado por JS -->
+					</div>
+				</div>
+
+				<!-- Acciones -->
+				<div class="resp-actions">
+					<a href="/" class="resp-btn-primary">
+						<i class="fas fa-calendar-alt"></i> Ver programación
+					</a>
+					<a href="/" class="resp-btn-secondary">
+						<i class="fas fa-home"></i> Volver al inicio
+					</a>
+				</div>
+
+			</div>
+
+			<!-- Error de carga -->
+			<div class="resp-error-block" id="resp-error-block">
+				<div class="resp-error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+				<h3 class="resp-error-title">No pudimos verificar tu transacción</h3>
+				<p class="resp-error-sub">Revisa tu correo o contáctanos para confirmar el estado de tu compra.</p>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script>
+	(() => {
+		'use strict';
+
+		function getQueryParam (param) {
+			const match = location.search.slice(1).split('&')
+				.find(p => p.split('=')[0] === param);
+			return match ? decodeURIComponent(match.split('=')[1] || '') : null;
+		}
+
+		const ESTADOS = {
+			1: { cls: 'ok', icon: 'fa-check-circle', title: 'Pago aprobado', msg: 'Tu transacción fue procesada con éxito. Recibirás un correo con los detalles de tu compra.' },
+			2: { cls: 'fail', icon: 'fa-times-circle', title: 'Pago rechazado', msg: 'La transacción fue rechazada. Revisa los datos de tu medio de pago e inténtalo nuevamente.' },
+			3: { cls: 'pending', icon: 'fa-clock', title: 'Pago pendiente', msg: 'Tu pago está pendiente de aprobación. Este proceso puede tardar hasta 20 minutos.' },
+			4: { cls: 'fail', icon: 'fa-exclamation-circle', title: 'Transacción fallida', msg: 'Ocurrió un error y el pago no pudo completarse. Por favor intenta de nuevo.' },
+			6: { cls: 'info', icon: 'fa-undo', title: 'Dinero reversado', msg: 'El dinero ha sido reintegrado a tu medio de pago. Contáctanos si tienes preguntas.' },
+			7: { cls: 'pending', icon: 'fa-shield-alt', title: 'En revisión de auditoría', msg: 'La transacción está retenida para validación. Te notificaremos pronto.' },
+			8: { cls: 'info', icon: 'fa-hourglass-start', title: 'Transacción iniciada', msg: 'Tu transacción ha sido iniciada. Estamos procesando tu solicitud.' },
+			9: { cls: 'neutral', icon: 'fa-calendar-times', title: 'Transacción expirada', msg: 'El tiempo para completar el pago venció. Puedes iniciar una nueva compra.' },
+			10: { cls: 'neutral', icon: 'fa-window-close', title: 'Navegador cerrado', msg: 'Parece que cerraste el navegador antes de terminar. Puedes intentar nuevamente.' },
+			11: { cls: 'neutral', icon: 'fa-ban', title: 'Pago cancelado', msg: 'Cancelaste el proceso antes de concluir. Puedes iniciar una nueva compra cuando quieras.' },
+		};
+
+		function makeDetailCard (iconCls, label, value, valueCls) {
+			return `
+			<div class="resp-detail-card">
+				<div class="resp-detail-icon resp-detail-icon--${iconCls}">
+					${iconCls === 'ref' ? '<i class="fas fa-hashtag"></i>' :
+					iconCls === 'date' ? '<i class="fas fa-calendar-alt"></i>' :
+						iconCls === 'bank' ? '<i class="fas fa-university"></i>' :
+							iconCls === 'total' ? '<i class="fas fa-dollar-sign"></i>' :
+								iconCls === 'receipt' ? '<i class="fas fa-receipt"></i>' :
+									'<i class="fas fa-info-circle"></i>'}
+				</div>
+				<div class="resp-detail-body">
+					<span class="resp-detail-label">${label}</span>
+					<span class="resp-detail-value${valueCls ? ' ' + valueCls : ''}">${value || '—'}</span>
+				</div>
+			</div>`;
+		}
+
+		const refPayco = getQueryParam('ref_payco');
+
+		if (!refPayco) {
+			document.getElementById('resp-loading').style.display = 'none';
+			document.getElementById('resp-error-block').style.display = 'block';
+			return;
+		}
+
+		fetch('https://secure.epayco.co/validation/v1/reference/' + refPayco)
+			.then(r => r.json())
+			.then(response => {
+				document.getElementById('resp-loading').style.display = 'none';
+
+				if (!response.success) {
+					document.getElementById('resp-error-block').style.display = 'block';
+					return;
+				}
+
+				const d = response.data;
+				const cod = parseInt(d.x_cod_transaction_state, 10);
+				const estado = ESTADOS[cod] || { cls: 'neutral', icon: 'fa-question-circle', title: 'Estado desconocido', msg: 'No pudimos determinar el estado de tu transacción.' };
+
+				// Ícono de estado
+				const iconEl = document.getElementById('resp-status-icon');
+				iconEl.className = `resp-status-icon resp-status-icon--${estado.cls}`;
+				document.getElementById('resp-icon-i').className = `fas ${estado.icon}`;
+
+				document.getElementById('resp-status-title').textContent = estado.title;
+				document.getElementById('resp-status-msg').textContent = estado.msg;
+
+				// Detalle cards
+				const grid = document.getElementById('resp-detail-grid');
+				grid.innerHTML =
+					makeDetailCard('ref', 'Referencia', d.x_id_invoice, '') +
+					makeDetailCard('date', 'Fecha', d.x_transaction_date, '') +
+					makeDetailCard('bank', 'Banco', d.x_bank_name, '') +
+					makeDetailCard('receipt', 'Recibo', d.x_transaction_id, '') +
+					makeDetailCard('status', 'Respuesta', d.x_response, '') +
+					makeDetailCard('total', 'Total', d.x_amount ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(d.x_amount) : '', 'resp-detail-value--total');
+
+				document.getElementById('resp-content').style.display = '';
+
+				// Notificar al servidor
+				fetch('/page/evento/respuesta2/', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(d),
+				})
+					.then(r => r.json())
+					.then(data => console.log('Servidor:', data))
+					.catch(err => console.error('Error servidor:', err));
+			})
+			.catch(() => {
+				document.getElementById('resp-loading').style.display = 'none';
+				document.getElementById('resp-error-block').style.display = 'block';
+			});
+	})();
+</script>

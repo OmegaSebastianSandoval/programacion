@@ -1,7 +1,7 @@
-<?php 
+<?php
 /**
-* clase que genera la insercion y edicion  de Boletas evento en la base de datos
-*/
+ * clase que genera la insercion y edicion  de Boletas evento en la base de datos
+ */
 class Administracion_Model_DbTable_Boletaevento extends Db_Table
 {
 	/**
@@ -21,18 +21,19 @@ class Administracion_Model_DbTable_Boletaevento extends Db_Table
 	 * @param  array Array array con la informacion con la cual se va a realizar la insercion en la base de datos
 	 * @return integer      identificador del  registro que se inserto
 	 */
-	public function insert($data){
+	public function insert($data)
+	{
 		$boleta_evento_tipo = $data['boleta_evento_tipo'];
 		$boleta_evento_cantidad = $data['boleta_evento_cantidad'];
 		$boleta_evento_saldo = $data['boleta_evento_saldo'];
 		$boleta_evento_evento = $data['boleta_evento_evento'];
 		$boleta_evento_precio = $data['boleta_evento_precio'];
-		$boleta_evento_precioadicional = $data['boleta_evento_precioadicional'];
+		$boleta_evento_precioreserva = $data['boleta_evento_precioreserva'];
 		$boleta_evento_fechalimite = $data['boleta_evento_fechalimite'];
 		$boleta_evento_horalimite = $data['boleta_evento_horalimite'];
-		$query = "INSERT INTO boleta_evento( boleta_evento_tipo, boleta_evento_cantidad, boleta_evento_saldo, boleta_evento_evento, boleta_evento_precio, boleta_evento_precioadicional, boleta_evento_fechalimite, boleta_evento_horalimite, boleta_evento_cantidad_vendidas) VALUES ( '$boleta_evento_tipo', '$boleta_evento_cantidad', '$boleta_evento_saldo', '$boleta_evento_evento', '$boleta_evento_precio', '$boleta_evento_precioadicional', '$boleta_evento_fechalimite', '$boleta_evento_horalimite', '0')";
+		$query = "INSERT INTO boleta_evento( boleta_evento_tipo, boleta_evento_cantidad, boleta_evento_saldo, boleta_evento_evento, boleta_evento_precio, boleta_evento_precioreserva, boleta_evento_fechalimite, boleta_evento_horalimite, boleta_evento_cantidad_vendidas) VALUES ( '$boleta_evento_tipo', '$boleta_evento_cantidad', '$boleta_evento_saldo', '$boleta_evento_evento', '$boleta_evento_precio', '$boleta_evento_precioreserva', '$boleta_evento_fechalimite', '$boleta_evento_horalimite', '0')";
 		$res = $this->_conn->query($query);
-        return mysqli_insert_id($this->_conn->getConnection());
+		return mysqli_insert_id($this->_conn->getConnection());
 	}
 
 	/**
@@ -41,17 +42,18 @@ class Administracion_Model_DbTable_Boletaevento extends Db_Table
 	 * @param  integer    identificador al cual se le va a realizar la actualizacion
 	 * @return void
 	 */
-	public function update($data,$id){
-		
+	public function update($data, $id)
+	{
+
 		$boleta_evento_tipo = $data['boleta_evento_tipo'];
 		$boleta_evento_cantidad = $data['boleta_evento_cantidad'];
 		$boleta_evento_saldo = $data['boleta_evento_saldo'];
 		$boleta_evento_evento = $data['boleta_evento_evento'];
 		$boleta_evento_precio = $data['boleta_evento_precio'];
-		$boleta_evento_precioadicional = $data['boleta_evento_precioadicional'];
+		$boleta_evento_precioreserva = $data['boleta_evento_precioreserva'];
 		$boleta_evento_fechalimite = $data['boleta_evento_fechalimite'];
 		$boleta_evento_horalimite = $data['boleta_evento_horalimite'];
-		$query = "UPDATE boleta_evento SET  boleta_evento_tipo = '$boleta_evento_tipo', boleta_evento_cantidad = '$boleta_evento_cantidad', boleta_evento_saldo = '$boleta_evento_saldo', boleta_evento_evento = '$boleta_evento_evento', boleta_evento_precio = '$boleta_evento_precio', boleta_evento_precioadicional = '$boleta_evento_precioadicional', boleta_evento_fechalimite = '$boleta_evento_fechalimite', boleta_evento_horalimite = '$boleta_evento_horalimite' WHERE boleta_evento_id = '".$id."'";
+		$query = "UPDATE boleta_evento SET  boleta_evento_tipo = '$boleta_evento_tipo', boleta_evento_cantidad = '$boleta_evento_cantidad', boleta_evento_saldo = '$boleta_evento_saldo', boleta_evento_evento = '$boleta_evento_evento', boleta_evento_precio = '$boleta_evento_precio', boleta_evento_precioreserva = '$boleta_evento_precioreserva', boleta_evento_fechalimite = '$boleta_evento_fechalimite', boleta_evento_horalimite = '$boleta_evento_horalimite' WHERE boleta_evento_id = '" . $id . "'";
 		$res = $this->_conn->query($query);
 	}
 }
