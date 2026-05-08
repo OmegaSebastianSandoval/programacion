@@ -22,7 +22,7 @@
 			<?php foreach ($rescontenido['hijos'] as $key => $resbanner) { ?>
 				<?php
 				$banner = $resbanner['detalle'];
-				$hasLink = !empty($banner->contenido_enlace);
+				$hasLink = ($banner->contenido_enlace);
 				$openBlank = ($banner->contenido_enlace_abrir == 1);
 				?>
 				<div class="carousel-item <?php if ($key == 0) { ?>active <?php } ?>">

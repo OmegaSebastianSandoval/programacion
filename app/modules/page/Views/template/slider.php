@@ -24,7 +24,7 @@
 
 <div class="row">
   <!-- DESCRIPCIÓN DEL SLIDER (opcional) -->
-  <?php if (!empty($columna->contenido_descripcion)): ?>
+  <?php if (($columna->contenido_descripcion)): ?>
     <div class="col-12 mb-3">
       <p class="slider-description"><?php echo $columna->contenido_descripcion; ?></p>
     </div>
@@ -40,7 +40,7 @@
     <div id="<?php echo $slider_id; ?>" class="slider_<?php echo $columna->contenido_id; ?> sliderCont w-100">
 
       <!-- ITEMS DEL SLIDER -->
-      <?php if (!empty($slidercontent) && is_array($slidercontent)): ?>
+      <?php if (($slidercontent) && is_array($slidercontent)): ?>
 
         <?php foreach ($slidercontent as $slider): ?>
           <div class="itemSlider">

@@ -32,7 +32,7 @@
 						MÁS<?php } ?></a>
 			</div>
 		<?php } ?>
-		<?php if (isset($rescontenido['hijos']) && is_countable($rescontenido['hijos']) && count($rescontenido['hijos']) > 0) { ?>
+		<?php if (($rescontenido['hijos']) && is_countable($rescontenido['hijos']) && count($rescontenido['hijos']) > 0) { ?>
 			<div
 				class="row <?php if ($contenedor->contenido_columna_alineacion == 2) { ?>justify-content-center text-center<?php } else if ($contenedor->contenido_columna_alineacion == 3) { ?>justify-content-end text-end<?php } else if ($contenedor->contenido_columna_alineacion == 4) { ?>justify-content-around text-center<?php } else if ($contenedor->contenido_columna_alineacion == 5) { ?>justify-content-between text-left<?php } else { ?>justify-content-start text-left<?php } ?> <?php if ($contenedor->contenido_columna_espacios == 2 || $contenedor->contenido_columna_espacios == 4) { ?>no-gutters<?php } ?>">
 

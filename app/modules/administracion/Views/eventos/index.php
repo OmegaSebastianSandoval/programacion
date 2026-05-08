@@ -182,7 +182,7 @@
 						<td>&iquest;Est&aacute; activo?</td>
 						<td>Estado</td>
 						<td width="100">Orden</td>
-						<td width="150"></td>
+						<td width="200"></td>
 					</tr>
 				</thead>
 				<tbody>
@@ -212,6 +212,10 @@
 								<div>
 									<a class="btn btn-morado btn-sm" href="/administracion/boletaevento?boleta_evento_evento=<?= $id ?>"
 										data-bs-toggle="tooltip" data-bs-placement="top" title="Boletas"><i class="fas fa-ticket-alt"></i></a>
+									<?php if (in_array($content->evento_tipo, ['reserva', 'reservayboleteria'])): ?>
+									<a class="btn btn-naranja btn-sm" href="/administracion/reservaevento?reserva_evento_evento=<?= $id ?>"
+										data-bs-toggle="tooltip" data-bs-placement="top" title="Zonas de Reserva"><i class="fas fa-map-marker-alt"></i></a>
+									<?php endif; ?>
 									<a class="btn btn-azul btn-sm" href="<?php echo $this->route; ?>/manage?id=<?= $id ?>"
 										data-bs-toggle="tooltip" data-bs-placement="top" title="Editar"><i class="fas fa-pen-alt"></i></a>
 									<span data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar"><a class="btn btn-rojo btn-sm"

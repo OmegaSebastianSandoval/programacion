@@ -4,7 +4,7 @@
 <div class="contenido">
   <?php echo $this->contenido; ?>
 </div>
-<?php if (isset($this->popUp) && $this->popUp->publicidad_estado == 1) { ?>
+<?php if (($this->popUp) && $this->popUp->publicidad_estado == 1) { ?>
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {

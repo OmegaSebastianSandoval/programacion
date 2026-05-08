@@ -5,7 +5,7 @@
 		<div class="content-dashboard">
 			<div class="row">
 				<div class="col-3">
-					<label>Tipo evento</label>
+					<label>Tipo boleta</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text input-icono "><i class="far fa-list-alt"></i></span>
@@ -146,7 +146,7 @@
 			<table class=" table table-striped  table-hover table-administrator text-left">
 				<thead>
 					<tr>
-						<td>Tipo evento</td>
+						<td>Tipo boleta</td>
 						<td>Cantidad</td>
 						<td>Vendidas</td>
 						<td>Evento</td>

@@ -1,15 +1,15 @@
 <?php
 $twitterUrl = '';
-if (!empty($this->infopage->info_pagina_twitter)) {
+if (($this->infopage->info_pagina_twitter)) {
   $twitterUrl = $this->infopage->info_pagina_twitter;
-} elseif (!empty($this->infopage->info_pagina_x)) {
+} elseif (($this->infopage->info_pagina_x)) {
   $twitterUrl = $this->infopage->info_pagina_x;
 }
 
 $linkedinUrl = '';
-if (!empty($this->infopage->info_pagina_linkdn)) {
+if (($this->infopage->info_pagina_linkdn)) {
   $linkedinUrl = $this->infopage->info_pagina_linkdn;
-} elseif (!empty($this->infopage->info_pagina_linkedin)) {
+} elseif (($this->infopage->info_pagina_linkedin)) {
   $linkedinUrl = $this->infopage->info_pagina_linkedin;
 }
 ?>
@@ -83,13 +83,13 @@ if (!empty($this->infopage->info_pagina_linkdn)) {
             <i class="fab fa-linkedin-in"></i>
           </a>
         <?php } ?>
-        <?php if (!empty($this->infopage->info_pagina_google)) { ?>
+        <?php if (($this->infopage->info_pagina_google)) { ?>
           <a href="<?php echo $this->infopage->info_pagina_google; ?>" target="_blank" rel="noopener noreferrer"
             class="red social-link" aria-label="Google Plus">
             <i class="fab fa-google-plus-g"></i>
           </a>
         <?php } ?>
-        <?php if (!empty($this->infopage->info_pagina_flickr)) { ?>
+        <?php if (($this->infopage->info_pagina_flickr)) { ?>
           <a href="<?php echo $this->infopage->info_pagina_flickr; ?>" target="_blank" rel="noopener noreferrer"
             class="red social-link" aria-label="Flickr">
             <i class="fab fa-flickr"></i>

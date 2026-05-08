@@ -200,7 +200,7 @@
       var checkout = ePayco.checkout.configure({
         sessionId: '<?= htmlspecialchars($this->sessionId ?? '', ENT_QUOTES, 'UTF-8') ?>',
         type: 'onpage',
-        test: <?= !empty($this->epaycoTest) ? 'true' : 'false' ?>
+        test: <?= ($this->epaycoTest) ? 'true' : 'false' ?>
       });
       checkout.onErrors(function (errors) {
         console.error('ePayco error:', errors);

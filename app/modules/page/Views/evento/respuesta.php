@@ -1,3 +1,11 @@
+<?php
+  $esReservaGratuita = ($this->reservaGratuita);
+  $compra  = $this->compra  ?? null;
+  $reserva = $this->reserva ?? null;
+  $evento  = $this->evento  ?? null;
+  $sede    = $this->sede    ?? null;
+?>
+
 <div class="resp-page">
 	<div class="container">
 		<div class="resp-card">
@@ -5,13 +13,112 @@
 			<!-- Cabecera -->
 			<div class="resp-card-header">
 				<div class="resp-card-header-icon">
-					<i class="fas fa-credit-card"></i>
+					<i class="fas <?= $esReservaGratuita ? 'fa-calendar-check' : 'fa-credit-card' ?>"></i>
 				</div>
 				<div>
-					<h1 class="resp-card-header-title">Respuesta de transacción</h1>
-					<p class="resp-card-header-sub">Verificando el estado de tu pago…</p>
+					<h1 class="resp-card-header-title"><?= $esReservaGratuita ? 'Reserva confirmada' : 'Respuesta de transacción' ?></h1>
+					<p class="resp-card-header-sub"><?= $esReservaGratuita ? 'Tu reserva gratuita ha sido registrada.' : 'Verificando el estado de tu pago…' ?></p>
 				</div>
 			</div>
+
+			<?php if ($esReservaGratuita): ?>
+
+			<!-- Reserva gratuita confirmada -->
+			<div id="resp-content">
+				<div class="resp-status-block">
+					<div class="resp-status-icon resp-status-icon--ok">
+						<i class="fas fa-check-circle"></i>
+					</div>
+					<h2 class="resp-status-title">¡Reserva confirmada!</h2>
+					<p class="resp-status-msg">Tu reserva gratuita ha sido registrada con éxito. Recibirás un correo con los detalles.</p>
+				</div>
+
+				<?php if ($evento): ?>
+				<div class="resp-event-card">
+					<?php if ($evento->evento_imagen): ?>
+					<img class="resp-event-img" src="/images/<?= ($evento->evento_imagen) ?>" alt="<?= ($evento->evento_nombre) ?>">
+					<?php endif; ?>
+					<div class="resp-event-info">
+						<h3 class="resp-event-title"><?= ($evento->evento_nombre) ?></h3>
+						<div class="resp-event-meta">
+							<?php if ($evento->evento_fecha): ?>
+							<span><i class="fas fa-calendar-alt"></i>
+								<?php
+									$ts = strtotime($evento->evento_fecha);
+									$meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+									echo date('j', $ts) . ' de ' . $meses[(int)date('n', $ts) - 1] . ' de ' . date('Y', $ts);
+								?>
+							</span>
+							<?php endif; ?>
+							<?php if ($evento->evento_hora): ?>
+							<span><i class="fas fa-clock"></i> <?= ($evento->evento_hora) ?></span>
+							<?php endif; ?>
+							<?php if ($sede && $sede->sede_nombre): ?>
+							<span><i class="fas fa-map-marker-alt"></i> <?= ($sede->sede_nombre) ?></span>
+							<?php endif; ?>
+							<?php if ($sede && $sede->sede_direccion): ?>
+							<span><i class="fas fa-road"></i> <?= ($sede->sede_direccion) ?></span>
+							<?php endif; ?>
+						</div>
+					</div>
+				</div>
+				<?php endif; ?>
+
+				<?php if ($compra): ?>
+				<div class="resp-details">
+					<div class="resp-detail-grid">
+						<div class="resp-detail-card">
+							<div class="resp-detail-icon resp-detail-icon--ref"><i class="fas fa-hashtag"></i></div>
+							<div class="resp-detail-body">
+								<span class="resp-detail-label">N° de reserva</span>
+								<span class="resp-detail-value"><?= ($compra->boleta_compra_id) ?></span>
+							</div>
+						</div>
+						<?php if ($reserva && $reserva->reserva_cantidad_personas): ?>
+						<div class="resp-detail-card">
+							<div class="resp-detail-icon resp-detail-icon--ref"><i class="fas fa-users"></i></div>
+							<div class="resp-detail-body">
+								<span class="resp-detail-label">Personas</span>
+								<span class="resp-detail-value"><?= (int) $reserva->reserva_cantidad_personas ?></span>
+							</div>
+						</div>
+						<?php endif; ?>
+						<div class="resp-detail-card">
+							<div class="resp-detail-icon resp-detail-icon--ref"><i class="fas fa-user"></i></div>
+							<div class="resp-detail-body">
+								<span class="resp-detail-label">Nombre</span>
+								<span class="resp-detail-value"><?= ($compra->boleta_compra_nombre) ?></span>
+							</div>
+						</div>
+						<div class="resp-detail-card">
+							<div class="resp-detail-icon resp-detail-icon--ref"><i class="fas fa-envelope"></i></div>
+							<div class="resp-detail-body">
+								<span class="resp-detail-label">Correo</span>
+								<span class="resp-detail-value"><?= ($compra->boleta_compra_email) ?></span>
+							</div>
+						</div>
+						<div class="resp-detail-card">
+							<div class="resp-detail-icon resp-detail-icon--total"><i class="fas fa-dollar-sign"></i></div>
+							<div class="resp-detail-body">
+								<span class="resp-detail-label">Total</span>
+								<span class="resp-detail-value resp-detail-value--total">Gratuito</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php endif; ?>
+
+				<div class="resp-actions">
+					<a href="/" class="resp-btn-primary">
+						<i class="fas fa-calendar-alt"></i> Ver programación
+					</a>
+					<a href="/" class="resp-btn-secondary">
+						<i class="fas fa-home"></i> Volver al inicio
+					</a>
+				</div>
+			</div>
+
+			<?php else: ?>
 
 			<!-- Estado de carga -->
 			<div class="resp-loading" id="resp-loading">
@@ -51,16 +158,19 @@
 			</div>
 
 			<!-- Error de carga -->
-			<div class="resp-error-block" id="resp-error-block">
+			<div class="resp-error-block" id="resp-error-block" style="display:none">
 				<div class="resp-error-icon"><i class="fas fa-exclamation-triangle"></i></div>
 				<h3 class="resp-error-title">No pudimos verificar tu transacción</h3>
 				<p class="resp-error-sub">Revisa tu correo o contáctanos para confirmar el estado de tu compra.</p>
 			</div>
 
+			<?php endif; ?>
+
 		</div>
 	</div>
 </div>
 
+<?php if (!$esReservaGratuita): ?>
 <script>
 	(() => {
 		'use strict';
@@ -160,3 +270,4 @@
 			});
 	})();
 </script>
+<?php endif; ?>
