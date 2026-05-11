@@ -23,22 +23,37 @@ class Administracion_Model_DbTable_Tickets extends Db_Table
 	 */
 	public function insert($data)
 	{
-		$ticket_compra_id = $data['ticket_compra_id'];
-		$ticket_evento_id = $data['ticket_evento_id'];
-		$ticket_numero_ticket = $data['ticket_numero_ticket'];
-		$ticket_uid = $data['ticket_uid'];
-		$ticket_token = $data['ticket_token'];
-		$ticket_estado = $data['ticket_estado'];
-		$ticket_fecha_creacion = $data['ticket_fecha_creacion'];
-		$ticket_fecha_validacion = $data['ticket_fecha_validacion'];
-		$ticket_metodo_validacion = $data['ticket_metodo_validacion'];
-		$ticket_dispositivo_validacion = $data['ticket_dispositivo_validacion'];
-		$ticket_ip_validacion = $data['ticket_ip_validacion'];
-		$ticket_fecha_expiracion = $data['ticket_fecha_expiracion'];
-		$ticket_observaciones = $data['ticket_observaciones'];
-		$ticket_usuario_validador = $data['ticket_usuario_validador'];
-		$query = "INSERT INTO tickets( ticket_compra_id, ticket_evento_id, ticket_numero_ticket, ticket_uid, ticket_token, ticket_estado, ticket_fecha_creacion, ticket_fecha_validacion, ticket_metodo_validacion, ticket_dispositivo_validacion, ticket_ip_validacion, ticket_fecha_expiracion, ticket_observaciones, ticket_usuario_validador) VALUES ( '$ticket_compra_id', '$ticket_evento_id', '$ticket_numero_ticket', '$ticket_uid', '$ticket_token', '$ticket_estado', '$ticket_fecha_creacion', '$ticket_fecha_validacion', '$ticket_metodo_validacion', '$ticket_dispositivo_validacion', '$ticket_ip_validacion', '$ticket_fecha_expiracion', '$ticket_observaciones', '$ticket_usuario_validador')";
-		$res = $this->_conn->query($query);
+		$ticket_compra_id              = $data['ticket_compra_id'] ?? '';
+		$ticket_evento_id              = $data['ticket_evento_id'] ?? '';
+		$ticket_numero_ticket          = $data['ticket_numero_ticket'] ?? '';
+		$ticket_uid                    = $data['ticket_uid'] ?? '';
+		$ticket_token                  = $data['ticket_token'] ?? '';
+		$ticket_estado                 = $data['ticket_estado'] ?? 1;
+		$ticket_tipo                   = $data['ticket_tipo'] ?? '';
+		$ticket_fecha_creacion         = $data['ticket_fecha_creacion'] ?? date('Y-m-d H:i:s');
+		$ticket_fecha_expiracion       = $data['ticket_fecha_expiracion'] ?? '';
+		$ticket_metodo_validacion      = $data['ticket_metodo_validacion'] ?? '';
+		$ticket_dispositivo_validacion = $data['ticket_dispositivo_validacion'] ?? '';
+		$ticket_ip_validacion          = $data['ticket_ip_validacion'] ?? '';
+		$ticket_observaciones          = $data['ticket_observaciones'] ?? '';
+		$ticket_usuario_validador      = $data['ticket_usuario_validador'] ?? '';
+
+		$fecha_validacion_sql = !empty($data['ticket_fecha_validacion'])
+			? "'" . $data['ticket_fecha_validacion'] . "'"
+			: 'NULL';
+
+		$query = "INSERT INTO tickets(
+			ticket_compra_id, ticket_evento_id, ticket_numero_ticket, ticket_uid, ticket_token,
+			ticket_estado, ticket_tipo, ticket_fecha_creacion, ticket_fecha_validacion,
+			ticket_metodo_validacion, ticket_dispositivo_validacion, ticket_ip_validacion,
+			ticket_fecha_expiracion, ticket_observaciones, ticket_usuario_validador
+		) VALUES (
+			'$ticket_compra_id', '$ticket_evento_id', '$ticket_numero_ticket', '$ticket_uid', '$ticket_token',
+			'$ticket_estado', '$ticket_tipo', '$ticket_fecha_creacion', $fecha_validacion_sql,
+			'$ticket_metodo_validacion', '$ticket_dispositivo_validacion', '$ticket_ip_validacion',
+			'$ticket_fecha_expiracion', '$ticket_observaciones', '$ticket_usuario_validador'
+		)";
+		$this->_conn->query($query);
 		return mysqli_insert_id($this->_conn->getConnection());
 	}
 

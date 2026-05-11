@@ -296,7 +296,7 @@ class Page_eventosController extends Page_mainController
 
       if ($totalFinal == 0) {
         $res = $this->enviarCorreoReserva($reservaInsertId);
-        header('Location: /page/eventos/respuesta?reserva_gratuita=1&compra='. $idCompra .'&res=' . $res);
+        header('Location: /page/eventos/respuesta?reserva_gratuita=1&compra=' . $idCompra . '&res=' . $res);
         exit;
       }
 
@@ -1032,30 +1032,42 @@ class Page_eventosController extends Page_mainController
       $logModel->insert($dataLog);
       return;
     }
-    $fechaEventoFinal = strtotime("$infoVenta->evento_fecha + 1 day");
+    $fechaEventoFinal = strtotime($infoVenta->evento->evento_fecha . " + 1 day");
     $qrsGenerados = [];
+
+    // Mapear número de ticket → tipo de boleta según el detalle
+    $tiposPorTicket = [];
+    $seq = 0;
+    foreach ($infoVenta->detalle as $item) {
+      for ($j = 0; $j < (int) $item->detalle_cantidad; $j++) {
+        $tiposPorTicket[++$seq] = $item->detalle_boleta_nombre;
+      }
+    }
 
     // Iterar desde 1 hasta la cantidad de boletos comprados
     for ($i = 1; $i <= $cantidad; $i++) {
+
+      $boletaTipo = $tiposPorTicket[$i] ?? 'Boleta';
 
       $dataTicket = [
         "ticket_compra_id" => $compraId,
         "ticket_numero_ticket" => $i,
         "ticket_estado" => 1,
+        "ticket_tipo" => $boletaTipo,
         "ticket_fecha_creacion" => date("Y-m-d H:i:s"),
-        "ticket_fecha_expiracion" => date("Y-m-d H:i:s", $fechaEventoFinal)
+        "ticket_fecha_expiracion" => date("Y-m-d H:i:s", $fechaEventoFinal),
       ];
 
       $nextId = $ticketsModel->getNextTicketId();
       $id = $ticketsModel->insert($dataTicket);
       $token = base_convert($id, 10, 36);
-      $yearMonth = date("Ym", strtotime($infoVenta->evento_fecha));
+      $yearMonth = date("Ym", strtotime($infoVenta->evento->evento_fecha));
       $customUid = "T-{$yearMonth}-" . str_pad($nextId, 7, "0", STR_PAD_LEFT);
-      $baseString = "{$compraId}-{$infoVenta->boleta_compra_email}-{$yearMonth}-{$nextId}";
+      $baseString = "{$compraId}-{$infoVenta->compra->boleta_compra_email}-{$yearMonth}-{$nextId}";
       $token = substr(base_convert(hash('sha256', $baseString), 16, 36), 0, 12);
       $ticketsModel->editField($id, "ticket_uid ", $customUid);
       $ticketsModel->editField($id, "ticket_token", $token);
-      $ticketsModel->editField($id, "ticket_evento_id", $infoVenta->boleta_evento_evento);
+      $ticketsModel->editField($id, "ticket_evento_id", $infoVenta->compra->boleta_compra_evento);
       $ticket = $ticketsModel->getById($id);
 
       $qrsGenerados[] = [
@@ -1064,17 +1076,23 @@ class Page_eventosController extends Page_mainController
         "ticket_token" => $token,
         "ticket_numero_ticket" => $i,
         "ticket_fecha_expiracion" => date("Y-m-d H:i:s", $fechaEventoFinal),
-        // "rutaQR" => $this->generarQR($customUid, $token),
-        "email" => $infoVenta->boleta_compra_email,
-        "nombre" => $infoVenta->boleta_compra_nombre,
-        "telefono" => $infoVenta->boleta_compra_telefono,
+        "rutaQR" => $this->generarQR($customUid, $token),
+        "email" => $infoVenta->compra->boleta_compra_email,
+        "nombre" => $infoVenta->compra->boleta_compra_nombre,
+        "boleta_tipo" => $boletaTipo,
         "estado" => $ticket->ticket_estado,
       ];
 
-      $this->generarpdfs($infoVenta, $ticket);
+      $this->generarpdfs($infoVenta, $ticket, $boletaTipo);
 
     }
-
+    $logModel = new Administracion_Model_DbTable_Log();
+    $dataLog = array();
+    $dataLog['log_log'] = print_r($qrsGenerados, true);
+    $dataLog['log_tipo'] = 'QR GENERADOS';
+    $logModel->insert($dataLog);
+    $email = new Core_Model_Sendingemail($this->_view);
+    $email->generarCorreoBoleteria($infoVenta, $qrsGenerados);
   }
   public function getVentaInfo($idCompra)
   {
@@ -1091,44 +1109,78 @@ class Page_eventosController extends Page_mainController
     $evento->evento_titulo_politica = null;
     $evento->evento_descripcion_politica = null;
 
+    $sedeModel = new Administracion_Model_DbTable_Sedes();
+    $sede = $evento->evento_lugar ? $sedeModel->getById($evento->evento_lugar) : null;
+
     return (object) [
       'compra' => $compra,
       'evento' => $evento,
       'detalle' => $detalleVenta,
+      'sede' => $sede,
     ];
 
 
   }
-  public function generarpdfs($infoVenta, $ticket)
+  public function generarQR($uid, $token)
+  {
+    $textoQR = RUTA_QR . "/validacion?uid={$uid}&token={$token}";
+    $rutaAbsoluta = $_SERVER['DOCUMENT_ROOT'] . "/images_sales/qrs/{$uid}.png";
+    $rutaWeb = "/images_sales/qrs/{$uid}.png";
+
+    if (!file_exists($rutaAbsoluta)) {
+      $options = new \chillerlan\QRCode\QROptions([
+        'outputType' => \chillerlan\QRCode\Output\QROutputInterface::GDIMAGE_PNG,
+        'imageBase64' => false,
+        'scale' => 6,
+        'quietzoneSize' => 2,
+      ]);
+      (new \chillerlan\QRCode\QRCode($options))->render($textoQR, $rutaAbsoluta);
+    }
+
+    return $rutaWeb;
+  }
+  public function generarpdfs($infoVenta, $ticket, $boletaTipo = 'Boleta')
   {
     $this->setLayout('blanco');
     $this->_view->ticket = $ticket;
     $this->_view->infoVenta = $infoVenta;
+    $this->_view->boletaTipo = $boletaTipo;
+
+    $docRoot = rtrim($_SERVER['DOCUMENT_ROOT'], '/');
+    $this->_view->docRoot = $docRoot;
 
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
     $options->set('isRemoteEnabled', true);
     $options->set('isPhpEnabled', false);
     $options->set('defaultFont', 'helvetica');
+    $options->set('chroot', $docRoot);
 
     $dompdf = new Dompdf($options);
 
     $content = $this->_view->getRoutPHP('modules/page/Views/template/generarpdf.php');
 
-    if ($infoVenta->evento_bono == 1) {
+    if ($infoVenta->evento->evento_bono == 1) {
       $terminos = $this->_view->getRoutPHP('modules/page/Views/template/terminosbonos.php');
     } else {
       $terminos = $this->_view->getRoutPHP('modules/page/Views/template/terminos.php');
     }
 
+    $fondoPath = 'file://' . $docRoot . '/images_sales/assets/FondoEnt.jpg';
+
     $html = '<!DOCTYPE html><html><head><meta charset="UTF-8">
 			<style>
+				@page { margin: 0; }
 				body { margin: 0; padding: 0; font-family: helvetica, sans-serif; font-size: 12px; }
 				.page-break { page-break-before: always; }
+				#fondo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+				#fondo img { width: 100%; height: 100%; }
 			</style>
-		</head><body>'
+		</head><body>
+		<div id="fondo"><img src="' . $fondoPath . '" /></div>
+		<div style="padding: 40px;">'
       . $content
-      . '<div class="page-break">' . $terminos . '</div>'
+      . '</div><div class="page-break" style="padding: 40px;">' . $terminos . '</div>'
       . '</body></html>';
 
     $dompdf->loadHtml($html);

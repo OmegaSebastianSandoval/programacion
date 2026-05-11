@@ -97,7 +97,7 @@ class Core_Model_Sendingemail
     $informacionModel = new Page_Model_DbTable_Informacion();
     $informacion = $informacionModel->getList("", "orden ASC")[0];
     $correo = $informacion->info_pagina_correos_contacto;
-    $email = $infoVenta->boleta_compra_email;
+    $email = $infoVenta->compra->boleta_compra_email;
     if (APPLICATION_ENV == 'production') {
       $this->email->getMail()->addBCC($correo, "Confirmación Galeria Cafe Libro");
 
