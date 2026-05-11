@@ -4,6 +4,13 @@
   <section id="cal-section" class="cal-section">
     <div class="container">
 
+      <header class="cal-page-header">
+        <div class="cal-page-header__left">
+          <div class="cal-page-header__label">Programación</div>
+          <h1 class="cal-page-header__title">Calendario de <em>Eventos</em></h1>
+        </div>
+      </header>
+
       <div class="cal-header">
         <button class="cal-nav-btn" id="cal-prev" aria-label="Mes anterior">
           <i class="fas fa-chevron-left"></i>
