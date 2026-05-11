@@ -1137,6 +1137,15 @@ class Page_eventosController extends Page_mainController
     $name = PDFS_PATH . "ticket_{$ticket->ticket_uid}.pdf";
     file_put_contents($name, $dompdf->output());
   }
+  public function enviarReservacion($reservacionId)
+  {
+     if (!$reservacionId) {
+      return null;
+    }
+    $reservacionesModel = new Administracion_Model_DbTable_Reservas();
+    $reservacion = $reservacionesModel->getById($reservacionId);
+    
+  }
 }
 
 // https://rdbd9vcd-8043.use2.devtunnels.ms/page/eventos/respuesta?ref_payco=b55e48c797674450e476881e

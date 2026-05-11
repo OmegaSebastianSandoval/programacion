@@ -31,7 +31,7 @@ class Core_Model_Sendingemail
       $this->_view->host = "http://" . $_SERVER['HTTP_HOST'] . "/";
       $this->_view->nombre = $user->user_names . " " . $user->user_lastnames;
       $this->_view->usuario = $user->user_user;
-      $this->email->getMail()->addAddress($user->user_email,  $user->user_names . " " . $user->user_lastnames);
+      $this->email->getMail()->addAddress($user->user_email, $user->user_names . " " . $user->user_lastnames);
       $content = $this->_view->getRoutPHP('/../app/modules/core/Views/templatesemail/forgotpassword.php');
       $this->email->getMail()->Subject = "Recuperación de Contraseña Gestor de Contenidos";
       $this->email->getMail()->msgHTML($content);
@@ -52,6 +52,33 @@ class Core_Model_Sendingemail
     $this->email->getMail()->msgHTML($content);
     $this->email->getMail()->AltBody = $content;
     // $this->email->getMail()->addBCC($informacion->info_pagina_correo_oculto);
+    if ($this->email->sed() == true) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
+  public function generarCorreoBoleteria($infoVenta, $qrsGenerados)
+  {
+
+    $this->_view->tickets = $qrsGenerados;
+    $this->_view->infoVenta = $infoVenta;
+    $informacionModel = new Page_Model_DbTable_Informacion();
+    $informacion = $informacionModel->getList("", "orden ASC")[0];
+    $correo = $informacion->info_pagina_correos_contacto;
+    $email = $infoVenta->boleta_compra_email;
+    if (APPLICATION_ENV == 'production') {
+      $this->email->getMail()->addBCC($correo, "Confirmación Galeria Cafe Libro");
+
+      $this->email->getMail()->addAddress($email, "Confirmación Galería Cafe Libro");
+    }
+    $this->email->getMail()->addBCC("desarrollo8@omegawebsystems.com", "Confirmación Galeria Cafe Libro");
+
+    $content = $this->_view->getRoutPHP('/../app/modules/core/Views/templatesemail/generarcorreo.php');
+    $this->email->getMail()->Subject = "Envío Boleteria Galería Cafe Libro";
+    $this->email->getMail()->msgHTML($content);
+    $this->email->getMail()->AltBody = $content;
     if ($this->email->sed() == true) {
       return 1;
     } else {

@@ -54,9 +54,9 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
   </div>
 <?php endif; ?>
 
-<div class="container">
-  <div class="ev-page">
 
+  <div class="ev-page">
+<div class="container d-flex flex-wrap gap-4">
     <!-- ===================== PANEL IZQUIERDO: IMAGEN ===================== -->
     <div class="ev-panel-img">
       <?php if ($ev->evento_imagen): ?>
@@ -261,9 +261,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
         </div>
       <?php endif; ?>
     </div>
-
   </div>
-</div>
 
 <!-- ========== MODAL DE COMPRA ========== -->
 <?php if ($hayDisponible): ?>
