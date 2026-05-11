@@ -14,7 +14,7 @@ if (($this->infopage->info_pagina_linkdn)) {
 }
 ?>
 
-<footer class="auth-footer fixed-bottom">
+<footer class="auth-footer">
   <div class="container py-2">
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2">
       <div>

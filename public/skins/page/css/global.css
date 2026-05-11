@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 /* ===== VARIABLES GLOBALES DEL SITIO ===== */
 /* Cambia --color-acento para adaptar el color de marca en todo el sitio */
 :root {
@@ -174,9 +176,9 @@ table {
 }
 
 .auth-footer {
-  background: #ffffff;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  color: #1f2a37;
+  background: var(--brand-verde);
+  border-top: 3px solid var(--brand-amarillo);
+  color: rgba(255, 255, 255, 0.75);
   z-index: 1030;
 }
 
@@ -186,13 +188,26 @@ table {
 }
 
 .auth-footer a {
-  color: #4f46e5;
+  color: var(--brand-amarillo);
   font-weight: 600;
 }
 
 .auth-footer a:hover,
 .auth-footer a:focus {
-  color: #4338ca;
+  color: var(--brand-amarillo-hover);
+}
+
+.auth-footer .social-link {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.auth-footer .social-link:hover,
+.auth-footer .social-link:focus {
+  color: var(--brand-verde);
+  background: var(--brand-amarillo);
+  border-color: var(--brand-amarillo);
 }
 
 .social-link {
@@ -2936,5 +2951,407 @@ table {
     width: 100%;
     min-width: unset;
     height: 160px;
+  }
+}
+
+/* ============================================================
+   LISTADO DE EVENTOS — evl-*
+   ============================================================ */
+
+.evl-page {
+  padding: 4rem 0 6rem;
+  min-height: calc(100vh - var(--global-header-height, 76px));
+  background: #f5f0e8;
+}
+
+.evl-page,
+.evl-page * {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.evl-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(26, 18, 9, .1);
+}
+
+.evl-hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--brand-rosa);
+  margin-bottom: .55rem;
+}
+
+.evl-hero-title {
+  font-family: 'Cormorant', serif;
+  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  font-weight: 600;
+  color: #1a1209;
+  letter-spacing: -.025em;
+  line-height: 1.0;
+  margin: 0;
+}
+
+.evl-hero-title em {
+  font-style: italic;
+  color: var(--brand-rosa);
+}
+
+.evl-hero-count {
+  text-align: right;
+  margin: 0;
+  padding-bottom: .25rem;
+}
+
+.evl-hero-count strong {
+  display: block;
+  font-family: 'Cormorant', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1a1209;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.evl-hero-count span {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #a09880;
+}
+
+/* ── Grid ─────────────────────────────────────────────────── */
+.evl-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.evl-card {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 18px rgba(26, 18, 9, .07);
+  transition: transform .3s cubic-bezier(.22, 1, .36, 1),
+    box-shadow .3s cubic-bezier(.22, 1, .36, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.evl-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 42px rgba(26, 18, 9, .13);
+}
+
+.evl-card-link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Media 4:5 ────────────────────────────────────────────── */
+.evl-card-media {
+  position: relative;
+  width: 100%;
+  padding-bottom: 125%; /* 4:5 portrait */
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--brand-verde);
+}
+
+.evl-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .6s cubic-bezier(.22, 1, .36, 1);
+}
+
+.evl-card:hover .evl-card-img {
+  transform: scale(1.06);
+}
+
+.evl-card-no-img {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--brand-verde) 0%, #082318 100%);
+}
+
+.evl-card-media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, rgba(26, 18, 9, .42) 100%);
+  pointer-events: none;
+}
+
+/* Date badge */
+.evl-card-date {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 11px;
+  padding: .45rem .65rem;
+  min-width: 46px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .24);
+  line-height: 1;
+  gap: .1rem;
+}
+
+.evl-card-date-day {
+  font-family: 'Cormorant', serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1a1209;
+  letter-spacing: -.03em;
+  line-height: 1;
+}
+
+.evl-card-date-mon {
+  font-size: .53rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--brand-rosa);
+}
+
+/* Tipo badge — abajo a la derecha sobre imagen */
+.evl-card-tipo {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  font-size: .56rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: .26rem .7rem;
+  border-radius: 50px;
+  line-height: 1.5;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Body ─────────────────────────────────────────────────── */
+.evl-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.evl-card-sede {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #b0a890;
+  text-transform: uppercase;
+}
+
+.evl-card-sede-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sede-color, var(--brand-verde));
+  flex-shrink: 0;
+}
+
+.evl-card-title {
+  font-family: 'Cormorant', serif;
+  font-size: 1.22rem;
+  font-weight: 600;
+  color: #1a1209;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.evl-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: .7rem;
+  border-top: 1px solid #ede8de;
+}
+
+.evl-card-time {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  font-size: .7rem;
+  font-weight: 500;
+  color: #c0b8a0;
+}
+
+.evl-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--brand-rosa);
+  transition: gap .2s ease;
+}
+
+.evl-card:hover .evl-card-cta {
+  gap: .55rem;
+}
+
+/* ── Empty state ──────────────────────────────────────────── */
+.evl-empty {
+  text-align: center;
+  padding: 6rem 1rem;
+}
+
+.evl-empty-icon {
+  font-size: 3.5rem;
+  color: #d4ccbb;
+  margin-bottom: 1.5rem;
+}
+
+.evl-empty-title {
+  font-family: 'Cormorant', serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: #1a1209;
+  margin: 0 0 .6rem;
+}
+
+.evl-empty-sub {
+  font-size: .9rem;
+  font-weight: 400;
+  color: #b0a890;
+  margin: 0 0 2rem;
+}
+
+/* ── Pagination ───────────────────────────────────────────── */
+.evl-pag-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  margin-top: 4rem;
+  flex-wrap: wrap;
+}
+
+.evl-pag-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 .6rem;
+  border-radius: 50px;
+  border: 1.5px solid #e0d9cc;
+  background: #fff;
+  color: #555;
+  font-size: .82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .18s, border-color .18s, color .18s, box-shadow .18s;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.evl-pag-btn:hover {
+  border-color: var(--brand-rosa);
+  color: var(--brand-rosa);
+  background: #fff5f8;
+}
+
+.evl-pag-btn--active {
+  background: var(--brand-rosa) !important;
+  border-color: var(--brand-rosa) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(221, 18, 121, .28);
+  pointer-events: none;
+}
+
+.evl-pag-btn--disabled {
+  opacity: .3;
+  pointer-events: none;
+}
+
+.evl-pag-btn--nav {
+  padding: 0 1rem;
+  gap: .4rem;
+  font-size: .7rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.evl-pag-ellipsis {
+  color: #bbb;
+  font-size: .85rem;
+  padding: 0 .3rem;
+  user-select: none;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .evl-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .evl-page {
+    padding: 2.5rem 0 4rem;
+  }
+
+  .evl-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .4rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .evl-hero-count {
+    text-align: left;
+  }
+
+  .evl-hero-count strong {
+    font-size: 2rem;
+  }
+
+  .evl-grid {
+    grid-template-columns: 1fr;
+    gap: .85rem;
+  }
+
+  .evl-card-media {
+    padding-bottom: 100%;
   }
 }
