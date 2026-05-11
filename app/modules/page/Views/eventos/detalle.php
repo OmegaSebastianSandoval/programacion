@@ -439,6 +439,28 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
   </div>
 <?php endif; ?>
 
+<!-- ========== MODAL CONFIRMACIÓN DE PAGO ========== -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered ev-modal-confirm-dialog">
+    <div class="modal-content ev-modal-confirm-content">
+      <div class="ev-confirm-header">
+        <div class="ev-confirm-icon"><i class="fas fa-shield-alt"></i></div>
+        <h5 class="ev-confirm-title">¿Confirmas tu pedido?</h5>
+        <p class="ev-confirm-sub">Al continuar serás redirigido a la pasarela de pago seguro.</p>
+      </div>
+      <div class="ev-confirm-resumen" id="ev-confirm-resumen"></div>
+      <div class="ev-confirm-footer">
+        <button class="ev-confirm-btn-cancel" id="ev-confirm-cancel" data-bs-dismiss="modal">
+          <i class="fas fa-arrow-left"></i> Volver
+        </button>
+        <button class="ev-confirm-btn-ok" id="ev-confirm-ok">
+          <i class="fas fa-lock"></i> Sí, continuar al pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   (() => {
     'use strict';
@@ -449,6 +471,33 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
     const RESERVAS = <?= $this->reservasJson ?>;
 
     const formatCOP = n => (n === 0 ? 'Gratis' : '$ ' + Math.round(n).toLocaleString('es-CO'));
+
+    // ── Modal de confirmación ────────────────────────────────────────────────
+    let pendingForm = null;
+
+    function mostrarConfirmacion(form, totalText) {
+      pendingForm = form;
+      const resEl = document.getElementById('ev-confirm-resumen');
+      if (resEl) {
+        resEl.innerHTML =
+          '<span class="ev-confirm-resumen-label">Total a pagar</span>' +
+          '<strong class="ev-confirm-resumen-total">' + totalText + '</strong>';
+      }
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('modalConfirmacion')).show();
+    }
+
+    const confirmOkBtn = document.getElementById('ev-confirm-ok');
+    if (confirmOkBtn) {
+      confirmOkBtn.addEventListener('click', () => {
+        if (!pendingForm) return;
+        confirmOkBtn.disabled = true;
+        confirmOkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando…';
+        document.body.appendChild(pendingForm);
+        const f = pendingForm;
+        pendingForm = null;
+        f.submit();
+      });
+    }
 
     // ── Política de aceptación ───────────────────────────────────────────────
     const checkAcepto = document.getElementById('ev-acepto-politicas');
@@ -623,8 +672,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
           inp.value = val;
           form.appendChild(inp);
         }
-        document.body.appendChild(form);
-        form.submit();
+        mostrarConfirmacion(form, formatCOP(total));
       });
 
       // ────────────────────────────────────────────────────────────────────────
@@ -912,8 +960,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
           inp.value = val;
           form.appendChild(inp);
         }
-        document.body.appendChild(form);
-        form.submit();
+        mostrarConfirmacion(form, formatCOP(totalFinal));
       });
     }
   })();

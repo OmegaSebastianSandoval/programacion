@@ -198,7 +198,7 @@ $nombre = $this->infoVenta->boleta_compran_nombre;
                                                           <?php if (file_exists($ruta)) {
                                                             $rutaEncriptada = urlencode(encryptString($ruta));
                                                           ?>
-                                                            <a href="<?= RUTA_QR ?>/page/programacion/leerpdf/?token=<?= $rutaEncriptada ?>" target="_blank">
+                                                            <a href="/page/programacion/leerpdf/?token=<?= $rutaEncriptada ?>" target="_blank">
                                                               <?= $ticket["ticket_uid"] ?>
                                                             </a>
                                                           <?php }  ?>

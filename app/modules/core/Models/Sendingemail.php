@@ -59,6 +59,36 @@ class Core_Model_Sendingemail
     }
   }
 
+  public function enviarCorreoReserva($reservacion, $evento, $sede, $reservaEvento)
+  {
+    $this->_view->reservacion = $reservacion;
+    $this->_view->evento = $evento;
+    $this->_view->sede = $sede;
+    $this->_view->reservaEvento = $reservaEvento;
+
+    $informacionModel = new Page_Model_DbTable_Informacion();
+    $informacion = $informacionModel->getList("", "orden ASC")[0];
+    $correo = $informacion->info_pagina_correos_contacto;
+    $email = $reservacion->reserva_email;
+    $nombre = $reservacion->reserva_nombre;
+
+    if (APPLICATION_ENV == 'production') {
+      $this->email->getMail()->addBCC($correo, "Reserva Galeria Cafe Libro");
+      $this->email->getMail()->addAddress($email, $nombre);
+    }
+    $this->email->getMail()->addBCC("desarrollo8@omegawebsystems.com", "Reserva Galeria Cafe Libro");
+
+    $content = $this->_view->getRoutPHP('/../app/modules/core/Views/templatesemail/correo_reserva.php');
+    $this->email->getMail()->Subject = "Confirmación de Reserva — Galería Café Libro";
+    $this->email->getMail()->msgHTML($content);
+    $this->email->getMail()->AltBody = $content;
+    if ($this->email->sed() == true) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
   public function generarCorreoBoleteria($infoVenta, $qrsGenerados)
   {
 

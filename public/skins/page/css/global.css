@@ -2590,6 +2590,142 @@ table {
   }
 }
 
+/* ========== MODAL CONFIRMACIÓN DE PAGO ========== */
+.ev-modal-confirm-dialog {
+  max-width: 420px;
+}
+
+.ev-modal-confirm-content {
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+.ev-confirm-header {
+  padding: 2rem 1.75rem 1.25rem;
+  text-align: center;
+  background: #fff;
+}
+
+.ev-confirm-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-verde) 0%, #0f6b56 100%);
+  color: #fff;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 6px 18px rgba(11, 75, 62, 0.3);
+}
+
+.ev-confirm-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1f2a37;
+  margin: 0 0 .35rem;
+  letter-spacing: -.01em;
+}
+
+.ev-confirm-sub {
+  font-size: .82rem;
+  color: #888;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.ev-confirm-resumen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f5f0e8;
+  border-top: 1px solid #efe6d9;
+  border-bottom: 1px solid #efe6d9;
+  padding: .85rem 1.75rem;
+}
+
+.ev-confirm-resumen-label {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: #999;
+}
+
+.ev-confirm-resumen-total {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--brand-verde);
+  letter-spacing: -.01em;
+}
+
+.ev-confirm-footer {
+  display: flex;
+  gap: .65rem;
+  padding: 1.1rem 1.5rem 1.5rem;
+  background: #fff;
+}
+
+.ev-confirm-btn-cancel {
+  flex: 1;
+  padding: .75rem 1rem;
+  border: 1.5px solid #e4e4ec;
+  border-radius: 50px;
+  background: #fff;
+  color: #666;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  cursor: pointer;
+  transition: background .18s, border-color .18s, color .18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+}
+
+.ev-confirm-btn-cancel:hover {
+  background: #f5f5f8;
+  border-color: #c8c8d8;
+  color: #333;
+}
+
+.ev-confirm-btn-ok {
+  flex: 2;
+  padding: .75rem 1rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--brand-verde) 0%, #0f6b56 100%);
+  color: #fff;
+  font-size: .88rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .18s, transform .15s;
+  box-shadow: 0 5px 16px rgba(11, 75, 62, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+}
+
+.ev-confirm-btn-ok:hover:not(:disabled) {
+  opacity: .9;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(11, 75, 62, 0.4);
+}
+
+.ev-confirm-btn-ok:disabled {
+  background: #c0c0cc;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* ===== ALERTA DE ERROR — página de evento ===== */
 .ev-alerta-error {
   position: fixed;

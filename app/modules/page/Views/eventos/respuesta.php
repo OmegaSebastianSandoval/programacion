@@ -4,6 +4,7 @@ $compra = $this->compra ?? null;
 $reserva = $this->reserva ?? null;
 $evento = $this->evento ?? null;
 $sede = $this->sede ?? null;
+$correoRes = isset($this->correoRes) ? (int) $this->correoRes : 0;
 ?>
 
 <div class="resp-page">
@@ -29,6 +30,19 @@ $sede = $this->sede ?? null;
 
 				<!-- Reserva gratuita confirmada -->
 				<div id="resp-content">
+
+					<?php if ($correoRes === 1): ?>
+						<div class="alert alert-success d-flex align-items-center gap-2 mb-3" role="alert">
+							<i class="fas fa-envelope-circle-check"></i>
+							<span>Te enviamos un correo de confirmación con los detalles de tu reserva.</span>
+						</div>
+					<?php elseif ($correoRes === 2): ?>
+						<div class="alert alert-warning d-flex align-items-center gap-2 mb-3" role="alert">
+							<i class="fas fa-triangle-exclamation"></i>
+							<span>Tu reserva fue registrada, pero no pudimos enviarte el correo de confirmación. Guarda el número de reserva.</span>
+						</div>
+					<?php endif; ?>
+
 					<div class="resp-status-block">
 						<div class="resp-status-icon resp-status-icon--ok">
 							<i class="fas fa-check-circle"></i>

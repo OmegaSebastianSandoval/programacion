@@ -274,7 +274,7 @@ class Page_eventosController extends Page_mainController
         'reserva'
       ));
 
-      $reservasModel->insert([
+      $reservaInsertId = $reservasModel->insert([
         'reserva_compra_id' => $idCompra,
         'reserva_evento_id_fk' => $reservaEventoId,
         'reserva_evento' => $eventoId,
@@ -295,7 +295,8 @@ class Page_eventosController extends Page_mainController
       );
 
       if ($totalFinal == 0) {
-        header('Location: /page/eventos/respuesta?reserva_gratuita=1&compra=' . $idCompra);
+        $res = $this->enviarCorreoReserva($reservaInsertId);
+        header('Location: /page/eventos/respuesta?reserva_gratuita=1&compra='. $idCompra .'&res=' . $res);
         exit;
       }
 
@@ -735,6 +736,7 @@ class Page_eventosController extends Page_mainController
       $this->_view->reserva = $reserva;
       $this->_view->evento = $evento;
       $this->_view->sede = $sede;
+      $this->_view->correoRes = (int) $this->_getSanitizedParam('res');
       return;
     }
 
@@ -1137,14 +1139,35 @@ class Page_eventosController extends Page_mainController
     $name = PDFS_PATH . "ticket_{$ticket->ticket_uid}.pdf";
     file_put_contents($name, $dompdf->output());
   }
-  public function enviarReservacion($reservacionId)
+  public function enviarCorreoReserva($reservacionId)
   {
-     if (!$reservacionId) {
+    if (!$reservacionId) {
       return null;
     }
+
     $reservacionesModel = new Administracion_Model_DbTable_Reservas();
     $reservacion = $reservacionesModel->getById($reservacionId);
-    
+    if (!$reservacion)
+      return null;
+
+    $eventoModel = new Administracion_Model_DbTable_Eventos();
+    $evento = $eventoModel->getById($reservacion->reserva_evento);
+
+    $sede = null;
+    if ($evento && $evento->evento_lugar) {
+      $sedeModel = new Administracion_Model_DbTable_Sedes();
+      $sede = $sedeModel->getById($evento->evento_lugar);
+    }
+
+    $reservaEvento = null;
+    if ((int) $reservacion->reserva_evento_id_fk > 0) {
+      $reservaEventoModel = new Administracion_Model_DbTable_Reservaevento();
+      $reservaEvento = $reservaEventoModel->getById($reservacion->reserva_evento_id_fk);
+    }
+
+    $sendingEmail = new Core_Model_Sendingemail($this->_view);
+    $res = $sendingEmail->enviarCorreoReserva($reservacion, $evento, $sede, $reservaEvento);
+    return $res;
   }
 }
 
