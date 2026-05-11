@@ -4,7 +4,7 @@
  */
 class Administracion_eventosController extends Administracion_mainController
 {
-  public $botonpanel = 6;
+	public $botonpanel = 6;
 	/**
 	 * $mainModel  instancia del modelo de  base de datos eventos
 	 * @var modeloContenidos
@@ -308,7 +308,7 @@ class Administracion_eventosController extends Administracion_mainController
 		return $array;
 	}
 
-private function getVendedores()
+	private function getVendedores()
 	{
 		$modelData = new Administracion_Model_DbTable_Vendedores();
 		$data = $modelData->getList();
@@ -341,8 +341,8 @@ private function getVendedores()
 	 */
 	public function enlacevendedorAction()
 	{
-		$id = (int)$this->_getSanitizedParam("id");
-		$vendedorId = (int)$this->_getSanitizedParam("vendedor");
+		$id = (int) $this->_getSanitizedParam("id");
+		$vendedorId = (int) $this->_getSanitizedParam("vendedor");
 
 		$content = $this->mainModel->getById($id);
 		if (!$content || !$content->evento_id) {
@@ -354,7 +354,7 @@ private function getVendedores()
 		$vendedores = $vendedorModel->getList();
 		$vendedorNombre = '';
 		foreach ($vendedores as $v) {
-			if ((int)$v->id === $vendedorId) {
+			if ((int) $v->id === $vendedorId) {
 				$vendedorNombre = $v->nombre;
 				break;
 			}
@@ -362,7 +362,7 @@ private function getVendedores()
 
 		$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 		$host = $_SERVER['HTTP_HOST'];
-		$url = $scheme . '://' . $host . '/page/evento/detalle?vendedor=' . $vendedorId . '&id=' . $id;
+		$url = $scheme . '://' . $host . '/page/eventos/detalle?vendedor=' . $vendedorId . '&id=' . $id;
 
 		$title = "Enlace de vendedor — " . htmlspecialchars($content->evento_nombre);
 		$this->getLayout()->setTitle($title);
@@ -386,7 +386,7 @@ private function getVendedores()
 		$sedeId = $this->_getSanitizedParam("sede_id");
 		$model = new Administracion_Model_DbTable_Sedes();
 		$sede = $model->getById($sedeId);
-		echo json_encode(array('sede_aforo' => $sede ? (int)$sede->sede_aforo : 0));
+		echo json_encode(array('sede_aforo' => $sede ? (int) $sede->sede_aforo : 0));
 	}
 
 	/**

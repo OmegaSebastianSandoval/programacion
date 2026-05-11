@@ -2,8 +2,64 @@
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-class Page_eventoController extends Page_mainController
+class Page_eventosController extends Page_mainController
 {
+  public function indexAction()
+  {
+    $perPage = 9;
+    $currentPage = max(1, (int) ($this->_getSanitizedParam('pagina') ?: 1));
+
+    $hoy = date('Y-m-d') . ' 00:00:00';
+    $filters = "evento_activo='1' AND evento_estado='activo' AND evento_fecha >= '$hoy'";
+    $order = "evento_fecha ASC";
+
+    $eventosModel = new Administracion_Model_DbTable_Eventos();
+    $countResult = $eventosModel->getListCount($filters);
+    $totalCount = (int) ($countResult[0]->total ?? 0);
+    $totalPages = max(1, (int) ceil($totalCount / $perPage));
+
+    $currentPage = min($currentPage, $totalPages);
+    $offset = ($currentPage - 1) * $perPage;
+
+    $eventosRaw = $eventosModel->getListPages($filters, $order, $offset, $perPage);
+
+    $sedesModel = new Administracion_Model_DbTable_Sedes();
+    $sedesRaw = $sedesModel->getList("sede_estado='1'", "");
+    $sedeMap = [];
+    foreach ($sedesRaw as $sede) {
+      $sedeMap[(int) $sede->sede_id] = $sede;
+    }
+
+    $mesesCortos = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    $mesesLargos = ['', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    $eventos = [];
+    foreach ($eventosRaw as $ev) {
+      $sede = $sedeMap[(int) $ev->evento_lugar] ?? null;
+      $ts = strtotime($ev->evento_fecha);
+      $mesNum = (int) date('n', $ts);
+      $eventos[] = [
+        'id' => (int) $ev->evento_id,
+        'nombre' => $ev->evento_nombre,
+        'descripcion' => $ev->evento_descripcion,
+        'imagen' => $ev->evento_imagen,
+        'dia' => date('d', $ts),
+        'mes_corto' => $mesesCortos[$mesNum],
+        'mes_largo' => $mesesLargos[$mesNum],
+        'anio' => date('Y', $ts),
+        'hora' => substr($ev->evento_fecha, 11, 5),
+        'tipo' => $ev->evento_tipo ?? '',
+        'costo' => (int) $ev->evento_costo,
+        'sede_nombre' => $sede ? $sede->sede_nombre : '',
+        'sede_color' => $sede ? ($sede->sede_color ?: '#0b4b3e') : '#0b4b3e',
+      ];
+    }
+
+    $this->_view->eventos = $eventos;
+    $this->_view->currentPage = $currentPage;
+    $this->_view->totalPages = $totalPages;
+    $this->_view->totalCount = $totalCount;
+  }
   public function detalleAction()
   {
     $id = $this->_getSanitizedParam("id");
@@ -148,7 +204,7 @@ class Page_eventoController extends Page_mainController
     $totalFront = (float) $this->_getSanitizedParam('total');
 
     $redirectError = function ($msg) use ($eventoId) {
-      $base = $eventoId ? '/page/evento/detalle?id=' . $eventoId : '/';
+      $base = $eventoId ? '/page/eventos/detalle?id=' . $eventoId : '/';
       header('Location: ' . $base . '&error=' . urlencode($msg));
       exit;
     };
@@ -239,7 +295,7 @@ class Page_eventoController extends Page_mainController
       );
 
       if ($totalFinal == 0) {
-        header('Location: /page/evento/respuesta?reserva_gratuita=1&compra=' . $idCompra);
+        header('Location: /page/eventos/respuesta?reserva_gratuita=1&compra=' . $idCompra);
         exit;
       }
 
@@ -273,6 +329,7 @@ class Page_eventoController extends Page_mainController
       ));
 
       $this->insertarDetalles($resumen, $idCompra);
+      $this->preAsignarBoletas($resumen);
 
       // Reserva interna automática para control de ingreso/CRM
       $reservasModel->insert([
@@ -354,6 +411,7 @@ class Page_eventoController extends Page_mainController
       ));
 
       $this->insertarDetalles($resumen, $idCompra);
+      $this->preAsignarBoletas($resumen);
 
       if ($reservaEvento) {
         $reservasModel->insert([
@@ -555,6 +613,55 @@ class Page_eventoController extends Page_mainController
     }
   }
 
+  private function preAsignarBoletas($resumen)
+  {
+    $boletaeventoModel = new Administracion_Model_DbTable_Boletaevento();
+    foreach ($resumen as $item) {
+      $boleta = $item['boleta'];
+      $nueva = (int) ($boleta->boleta_evento_cantidad_vendidas ?? 0) + $item['cantidad'];
+      $boletaeventoModel->editField($boleta->boleta_evento_id, 'boleta_evento_cantidad_vendidas', $nueva);
+    }
+  }
+
+  private function revertirBoletas($compraId, $compraDetalleModel, $boletaseventoModel)
+  {
+    if (!$compraId)
+      return;
+    $boletasCompra = $compraDetalleModel->getList("detalle_compra = '$compraId'");
+    foreach ($boletasCompra as $boletacompra) {
+      $boleta = $boletaseventoModel->getById($boletacompra->detalle_boleta);
+      $cantidadComprada = (int) $boletacompra->detalle_cantidad;
+      $cantidadVendida = (int) ($boleta->boleta_evento_cantidad_vendidas ?? 0);
+      $boletaseventoModel->editField($boleta->boleta_evento_id, 'boleta_evento_cantidad_vendidas', max(0, $cantidadVendida - $cantidadComprada));
+    }
+  }
+
+  private function revertirCuposReserva($compraId, $comprasModel, $reservasModel)
+  {
+    if (!$compraId)
+      return;
+    $compra = $comprasModel->getById($compraId);
+    if (!$compra || $compra->boleta_compra_tipo !== 'reserva')
+      return;
+
+    $reserva = $reservasModel->getByCompraId($compraId);
+    if (!$reserva || !$reserva->reserva_id)
+      return;
+    if ($reserva->reserva_estado === 'cancelada')
+      return;
+
+    $reservasModel->editField($reserva->reserva_id, 'reserva_estado', 'cancelada');
+
+    if ((int) $reserva->reserva_evento_id_fk > 0) {
+      $reEvModel = new Administracion_Model_DbTable_Reservaevento();
+      $reEv = $reEvModel->getById($reserva->reserva_evento_id_fk);
+      if ($reEv) {
+        $nuevaCantidad = max(0, (int) ($reEv->reserva_evento_cantidad_vendidas ?? 0) - (int) $reserva->reserva_cantidad_personas);
+        $reEvModel->editField($reserva->reserva_evento_id_fk, 'reserva_evento_cantidad_vendidas', $nuevaCantidad);
+      }
+    }
+  }
+
   public function states()
   {
     $array = array();
@@ -635,6 +742,8 @@ class Page_eventoController extends Page_mainController
     if (!$ref) {
       $this->_view->reservaGratuita = false;
       $this->_view->compra = null;
+      $this->_view->evento = null;
+      $this->_view->sede = null;
       return;
     }
 
@@ -645,8 +754,27 @@ class Page_eventoController extends Page_mainController
     $logModel = new Administracion_Model_DbTable_Log();
     //$logModel->insert($data);
 
+    $compraRef = null;
+    $eventoRef = null;
+    $sedeRef = null;
+    $compraIdRef = (int) ($response->data->x_extra1 ?? 0);
+    if ($compraIdRef) {
+      $comprasModel = new Administracion_Model_DbTable_Compras();
+      $compraRef = $comprasModel->getById($compraIdRef);
+      if ($compraRef && $compraRef->boleta_compra_evento) {
+        $eventoModelRef = new Administracion_Model_DbTable_Eventos();
+        $eventoRef = $eventoModelRef->getById($compraRef->boleta_compra_evento);
+        if ($eventoRef && $eventoRef->evento_lugar) {
+          $sedeModelRef = new Administracion_Model_DbTable_Sedes();
+          $sedeRef = $sedeModelRef->getById($eventoRef->evento_lugar);
+        }
+      }
+    }
+
     $this->_view->reservaGratuita = false;
-    $this->_view->compra = null;
+    $this->_view->compra = $compraRef;
+    $this->_view->evento = $eventoRef;
+    $this->_view->sede = $sedeRef;
     $this->_view->response = $response->data;
     $this->_view->list_states = $this->states();
   }
@@ -723,19 +851,19 @@ class Page_eventoController extends Page_mainController
             $comprasModel->updateConfirmacion($respuesta, $estado, $estadoTx, $idCompra, $franquicia);
 
             if (!$yaConfirmada) {
-              // Actualizar boletas vendidas
-              $boletasCompra = $compraDetalleModel->getList("detalle_compra = '$idCompra'");
-              foreach ($boletasCompra as $boletacompra) {
-                $boleta = $boletaseventoModel->getById($boletacompra->detalle_boleta);
-                $cantidadComprada = (int) $boletacompra->detalle_cantidad;
-                $cantidadVendida = (int) ($boleta->boleta_evento_cantidad_vendidas ?? 0);
-                $boletaseventoModel->editField($boleta->boleta_evento_id, "boleta_evento_cantidad_vendidas", $cantidadVendida + $cantidadComprada);
-              }
-
               // Confirmar reserva asociada a esta compra
               $reserva = $reservasModel->getByCompraId($idCompra);
               if ($reserva && $reserva->reserva_id) {
                 $reservasModel->editField($reserva->reserva_id, 'reserva_estado', 'confirmada');
+              }
+
+              // Para reservayboleteria: incrementar cupo de la zona de reserva (no se pre-incrementó)
+              if ($compraExistente->boleta_compra_tipo === 'reservayboleteria' && $reserva && (int) $reserva->reserva_evento_id_fk > 0) {
+                $reEvModel = new Administracion_Model_DbTable_Reservaevento();
+                $reEv = $reEvModel->getById($reserva->reserva_evento_id_fk);
+                if ($reEv) {
+                  $reEvModel->editField($reserva->reserva_evento_id_fk, 'reserva_evento_cantidad_vendidas', (int) ($reEv->reserva_evento_cantidad_vendidas ?? 0) + 1);
+                }
               }
 
               $codigo = $_REQUEST['x_extra4'] ?? '';
@@ -762,9 +890,16 @@ class Page_eventoController extends Page_mainController
           $estadoTx = $_REQUEST['x_transaction_state'] ?? '';
           $franquicia = $_REQUEST['x_bank_name'] ?? '';
 
+          $compraAntes2 = $id ? $comprasModel->getById($id) : null;
+          $yaProcesada2 = $compraAntes2 && in_array($compraAntes2->boleta_compra_validacion, ['2', '4', '6']);
+
           $comprasModel->updateConfirmacion($respuesta, $estado, $estadoTx, $id, $franquicia);
 
-          //echo "transacción rechazada";
+          if (!$yaProcesada2) {
+            $this->revertirCuposReserva($id, $comprasModel, $reservasModel);
+            $this->revertirBoletas($id, $compraDetalleModel, $boletaseventoModel);
+          }
+
           break;
         case 3:
           # code transacción pendiente
@@ -790,9 +925,16 @@ class Page_eventoController extends Page_mainController
           $estadoTx = $_REQUEST['x_transaction_state'] ?? '';
           $franquicia = $_REQUEST['x_bank_name'] ?? '';
 
+          $compraAntes4 = $id ? $comprasModel->getById($id) : null;
+          $yaProcesada4 = $compraAntes4 && in_array($compraAntes4->boleta_compra_validacion, ['2', '4', '6']);
+
           $comprasModel->updateConfirmacion($respuesta, $estado, $estadoTx, $id, $franquicia);
 
-          //echo "transacción fallida";
+          if (!$yaProcesada4) {
+            $this->revertirCuposReserva($id, $comprasModel, $reservasModel);
+            $this->revertirBoletas($id, $compraDetalleModel, $boletaseventoModel);
+          }
+
           break;
         case 6:
           # transacción reversada — deshacer lo hecho en case 1
@@ -806,23 +948,35 @@ class Page_eventoController extends Page_mainController
 
           $compraExistente = $comprasModel->getById($idCompra);
           $estabaConfirmada = $compraExistente && $compraExistente->boleta_compra_validacion === '1';
+          // Boletas están pre-asignadas desde generarpagoAction; revertir si aún no se ha hecho
+          $boletasSinRevertir = $compraExistente && !in_array($compraExistente->boleta_compra_validacion, ['2', '4', '6']);
 
           $comprasModel->updateConfirmacion($respuesta, $estado, $estadoTx, $idCompra, $franquicia);
 
-          if ($estabaConfirmada) {
-            $boletasCompra = $compraDetalleModel->getList("detalle_compra = '$idCompra'");
-            foreach ($boletasCompra as $boletacompra) {
-              $boleta = $boletaseventoModel->getById($boletacompra->detalle_boleta);
-              $cantidadComprada = (int) $boletacompra->detalle_cantidad;
-              $cantidadVendida = (int) ($boleta->boleta_evento_cantidad_vendidas ?? 0);
-              $nuevaCantidad = max(0, $cantidadVendida - $cantidadComprada);
-              $boletaseventoModel->editField($boleta->boleta_evento_id, "boleta_evento_cantidad_vendidas", $nuevaCantidad);
-            }
+          if ($boletasSinRevertir) {
+            $this->revertirBoletas($idCompra, $compraDetalleModel, $boletaseventoModel);
+          }
 
-            // Revertir estado de reserva
+          if ($estabaConfirmada) {
+            // Revertir estado de reserva y cupos de zona de reserva
             $reserva = $reservasModel->getByCompraId($idCompra);
             if ($reserva && $reserva->reserva_id) {
               $reservasModel->editField($reserva->reserva_id, 'reserva_estado', 'cancelada');
+
+              if ((int) $reserva->reserva_evento_id_fk > 0) {
+                $reEvModel = new Administracion_Model_DbTable_Reservaevento();
+                $reEv = $reEvModel->getById($reserva->reserva_evento_id_fk);
+                if ($reEv) {
+                  $tipoCancelada = $compraExistente->boleta_compra_tipo ?? '';
+                  // solo_reserva: se pre-incrementó por cantidad de personas
+                  // reservayboleteria: se incrementó en case 1 por 1 unidad
+                  $decremento = ($tipoCancelada === 'reserva')
+                    ? (int) $reserva->reserva_cantidad_personas
+                    : 1;
+                  $nuevaCantidadRe = max(0, (int) ($reEv->reserva_evento_cantidad_vendidas ?? 0) - $decremento);
+                  $reEvModel->editField($reserva->reserva_evento_id_fk, 'reserva_evento_cantidad_vendidas', $nuevaCantidadRe);
+                }
+              }
             }
 
             $codigo = $_REQUEST['x_extra4'] ?? '';
@@ -985,9 +1139,9 @@ class Page_eventoController extends Page_mainController
   }
 }
 
-// https://rdbd9vcd-8043.use2.devtunnels.ms/page/evento/respuesta?ref_payco=b55e48c797674450e476881e
+// https://rdbd9vcd-8043.use2.devtunnels.ms/page/eventos/respuesta?ref_payco=b55e48c797674450e476881e
 // {
 // header_code:"502",
-// body:"Server error: `GET https://rdbd9vcd-8043.use2.devtunnels.ms/page/evento/confirmacion?x_cust_id_cliente=1264217&x_ref_payco=364251404&x_id_factura=1&x_id_invoice=1&x_description=Compra%203%20boleta%28s%29%20%C3%A2%C2%80%C2%94%20Test%20reserva%20y%20boleteria&x_amount=106000&x_amount_country=106000&x_amount_ok=106000&x_tax=0&x_amount_base=0&x_currency_code=COP&x_bank_name=BANCO%20DE%20PRUEBAS&x_cardnumber=457562%2A%2A%2A%2A%2A%2A%2A0326&x_quotas=1&x_respuesta=Rechazada&x_response=Rechazada&x_approval_code=000000&x_transaction_id=364251404&x_fecha_transaccion=2026-05-05%2016%3A36%3A14&x_transaction_date=2026-05-05%2016%3A36%3A14&x_cod_respuesta=2&x_cod_response=2&x_response_reason_text=04-Tarjeta%20restringida%20por%20el%20centro%20de%20autorizaciones&x_errorcode=04&x_cod_transaction_state=2&x_transaction_state=Rechazada&x_franchise=VS&x_payment_method=VS&x_business=Galeria%20Cafe%20Libro%20Club%20Social%20Privado%20SAS&x_customer_doctype=CC&x_customer_document=123123123&x_customer_name=Test&x_customer_lastname=nombre&x_customer_email=test%40test.com&x_customer_phone=3123123121&x_customer_movil=3123123121&x_customer_ind_pais=&x_customer_country=CO&x_customer_city=Bogota&x_customer_address=cll%202%20%2023-33&x_customer_ip=45.173.12.208&x_test_request=FALSE&x_extra1=1&x_extra2=3&x_extra3=1&x_extra4=testing123&x_extra5=&x_extra6=&x_extra7=&x_extra8=&x_extra9=&x_extra10=&x_tax_ico=0&x_payment_date=&x_signature=a02667c50d960df5d06489991833fec9489cf72c6474f4fe4ec259d76d180867&x_transaction_cycle=&is_processable=1&x_manual=1` resulted in a `502 Bad Gateway` response",
-// url:"https://rdbd9vcd-8043.use2.devtunnels.ms/page/evento/confirmacion",
+// body:"Server error: `GET https://rdbd9vcd-8043.use2.devtunnels.ms/page/eventos/confirmacion?x_cust_id_cliente=1264217&x_ref_payco=364251404&x_id_factura=1&x_id_invoice=1&x_description=Compra%203%20boleta%28s%29%20%C3%A2%C2%80%C2%94%20Test%20reserva%20y%20boleteria&x_amount=106000&x_amount_country=106000&x_amount_ok=106000&x_tax=0&x_amount_base=0&x_currency_code=COP&x_bank_name=BANCO%20DE%20PRUEBAS&x_cardnumber=457562%2A%2A%2A%2A%2A%2A%2A0326&x_quotas=1&x_respuesta=Rechazada&x_response=Rechazada&x_approval_code=000000&x_transaction_id=364251404&x_fecha_transaccion=2026-05-05%2016%3A36%3A14&x_transaction_date=2026-05-05%2016%3A36%3A14&x_cod_respuesta=2&x_cod_response=2&x_response_reason_text=04-Tarjeta%20restringida%20por%20el%20centro%20de%20autorizaciones&x_errorcode=04&x_cod_transaction_state=2&x_transaction_state=Rechazada&x_franchise=VS&x_payment_method=VS&x_business=Galeria%20Cafe%20Libro%20Club%20Social%20Privado%20SAS&x_customer_doctype=CC&x_customer_document=123123123&x_customer_name=Test&x_customer_lastname=nombre&x_customer_email=test%40test.com&x_customer_phone=3123123121&x_customer_movil=3123123121&x_customer_ind_pais=&x_customer_country=CO&x_customer_city=Bogota&x_customer_address=cll%202%20%2023-33&x_customer_ip=45.173.12.208&x_test_request=FALSE&x_extra1=1&x_extra2=3&x_extra3=1&x_extra4=testing123&x_extra5=&x_extra6=&x_extra7=&x_extra8=&x_extra9=&x_extra10=&x_tax_ico=0&x_payment_date=&x_signature=a02667c50d960df5d06489991833fec9489cf72c6474f4fe4ec259d76d180867&x_transaction_cycle=&is_processable=1&x_manual=1` resulted in a `502 Bad Gateway` response",
+// url:"https://rdbd9vcd-8043.use2.devtunnels.ms/page/eventos/confirmacion",
 // }

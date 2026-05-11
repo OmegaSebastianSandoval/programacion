@@ -160,17 +160,17 @@ table {
 
 .global-navbar {
   min-height: var(--global-header-height);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 3px solid var(--brand-amarillo);
 }
 
 .global-navbar .nav-link {
   font-weight: 600;
-  color: #1f2a37;
+  color: var(--brand-verde);
 }
 
 .global-navbar .nav-link:hover,
 .global-navbar .nav-link:focus {
-  color: #0d6efd;
+  color: var(--brand-rosa);
 }
 
 .auth-footer {
@@ -202,9 +202,9 @@ table {
   gap: 0.4rem;
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(79, 70, 229, 0.28);
+  border: 1px solid rgba(11, 75, 62, 0.28);
   border-radius: 50%;
-  color: #4f46e5;
+  color: var(--brand-verde);
   background: #ffffff;
   transition: all 0.2s ease;
 }
@@ -212,8 +212,8 @@ table {
 .social-link:hover,
 .social-link:focus {
   color: #ffffff;
-  background: #4338ca;
-  border-color: #4338ca;
+  background: var(--brand-rosa);
+  border-color: var(--brand-rosa);
 }
 
 .social-contact-link {
@@ -1525,27 +1525,66 @@ table {
   white-space: nowrap;
 }
 
-/* Botón políticas */
-.ev-politicas-btn {
-  display: inline-flex;
+/* Aviso de políticas */
+.ev-politicas-aviso {
+  display: flex;
   align-items: center;
-  gap: .4rem;
-  background: rgba(11, 75, 62, .07);
-  border: 1.5px solid var(--brand-verde);
-  color: var(--brand-verde);
-  border-radius: 50px;
-  padding: .42rem 1rem;
-  font-size: .8rem;
-  font-weight: 700;
-  letter-spacing: .03em;
+  gap: .9rem;
+  padding: .9rem 1.1rem;
+  background: #fff8ec;
+  border: 1.5px solid #f59e0b;
+  border-radius: 12px;
+  margin-bottom: 1.75rem;
   cursor: pointer;
-  transition: background .18s, color .18s;
-  margin-bottom: 1.5rem;
+  transition: background .18s, border-color .18s;
 }
 
-.ev-politicas-btn:hover {
-  background: var(--brand-verde);
+.ev-politicas-aviso:hover {
+  background: #fff2d6;
+  border-color: #d97706;
+}
+
+.ev-politicas-aviso-icon {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: #f59e0b;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .9rem;
+  flex-shrink: 0;
+}
+
+.ev-politicas-aviso-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  color: #5c3d00;
+}
+
+.ev-politicas-aviso-body strong {
+  font-size: .84rem;
+  font-weight: 700;
+}
+
+.ev-politicas-aviso-body span {
+  font-size: .78rem;
+  opacity: .8;
+  line-height: 1.35;
+}
+
+.ev-politicas-aviso-link {
+  font-size: .78rem;
+  font-weight: 700;
+  color: #d97706;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  flex-shrink: 0;
 }
 
 /* CTA sticky al fondo del panel */

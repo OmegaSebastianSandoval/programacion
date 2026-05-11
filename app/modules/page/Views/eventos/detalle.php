@@ -213,9 +213,14 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
 
         <!-- Políticas -->
         <?php if ($ev->evento_titulo_politica || $ev->evento_descripcion_politica): ?>
-          <button class="ev-politicas-btn" data-bs-toggle="modal" data-bs-target="#modalPoliticas">
-            <i class="fas fa-file-alt"></i> Ver políticas del evento
-          </button>
+          <div class="ev-politicas-aviso" role="button" tabindex="0" data-bs-toggle="modal" data-bs-target="#modalPoliticas">
+            <div class="ev-politicas-aviso-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="ev-politicas-aviso-body">
+              <strong><?= $ev->evento_titulo_politica ?: 'Políticas del evento' ?></strong>
+              <span>Debes leer y aceptar las políticas antes de continuar con tu compra.</span>
+            </div>
+            <span class="ev-politicas-aviso-link">Leer <i class="fas fa-chevron-right"></i></span>
+          </div>
         <?php endif; ?>
 
       </div>
@@ -600,7 +605,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
         const total = reservaSelPrecio * cantPersonas;
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/page/evento/generarpago';
+        form.action = '/page/eventos/generarpago';
         const campos = {
           evento_id: EVENTO_ID,
           nombre,
@@ -800,7 +805,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
           msg.className = 'ev-promo-msg ev-promo-msg--info';
           msg.textContent = 'Validando código…';
 
-          fetch('/page/evento/validarpromo', {
+          fetch('/page/eventos/validarpromo', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -889,7 +894,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/page/evento/generarpago';
+        form.action = '/page/eventos/generarpago';
         const campos = {
           evento_id: EVENTO_ID,
           nombre,

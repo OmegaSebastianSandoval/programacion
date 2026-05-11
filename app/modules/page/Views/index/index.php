@@ -329,7 +329,7 @@
 
       modalBody.innerHTML = body;
 
-      const detalleUrl = '/page/evento/detalle?id=' + ev.id + (vendedor ? '&vendedor=' + encodeURIComponent(vendedor) : '');
+      const detalleUrl = '/page/eventos/detalle?id=' + ev.id + (vendedor ? '&vendedor=' + encodeURIComponent(vendedor) : '');
       let btnIcon, btnText;
       if (ev.tipo === 'reserva') {
         btnIcon = 'fas fa-calendar-check';

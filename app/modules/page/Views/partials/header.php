@@ -16,7 +16,10 @@ if (($this->infopage->info_pagina_linkdn)) {
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top global-navbar">
   <div class="container">
-    <a class="navbar-brand fw-semibold" href="/">Sitio Web</a>
+    <a class="navbar-brand fw-semibold" href="/">
+      <img src="/skins/page/images/logogaleria.png" alt="Logo" class="d-inline-block align-text-top" style="height: 50px;">
+       
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#globalNavbar"
       aria-controls="globalNavbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -25,7 +28,7 @@ if (($this->infopage->info_pagina_linkdn)) {
     <div class="collapse navbar-collapse" id="globalNavbar">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="/page/eventos">Eventos</a></li>
         <li class="nav-item"><a class="nav-link" href="#">About</a></li>
         <li class="nav-item"><a class="nav-link" href="/page/contacto">Contact</a></li>
       </ul>
