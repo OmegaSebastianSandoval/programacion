@@ -165,7 +165,7 @@
 								<?php $disponibles = (int)$b->boleta_evento_cantidad - (int)$b->boleta_evento_cantidad_vendidas; ?>
 								<option value="<?= $b->boleta_evento_id; ?>"
 									<?php if ($this->getObjectVariable($this->content, 'reserva_evento_boleta_req') == $b->boleta_evento_id) echo 'selected'; ?>>
-									Tipo <?= $b->boleta_evento_tipo; ?> — $<?= number_format((int)$b->boleta_evento_precio, 0, ',', '.'); ?> (<?= $disponibles; ?> disponibles)
+									Tipo <?= $b->boleta_evento_tipo; ?> — (<?= $b->boleta_evento_boleta_nombre; ?>) $<?= number_format((int)$b->boleta_evento_precio, 0, ',', '.'); ?> (<?= $disponibles; ?> disponibles)
 								</option>
 							<?php endforeach ?>
 						</select>

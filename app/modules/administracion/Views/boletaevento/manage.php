@@ -63,7 +63,7 @@
 						<div class="input-group-prepend">
 							<span class="input-group-text input-icono  "><i class="far fa-list-alt"></i></span>
 						</div>
-						<select class="form-control" name="boleta_evento_tipo">
+						<select class="form-control select2-tipo-boleta" name="boleta_evento_tipo">
 							<option value="">Seleccione...</option>
 							<?php foreach ($this->list_boleta_evento_tipo as $key => $value) { ?>
 								<option <?php if ($this->getObjectVariable($this->content, "boleta_evento_tipo") == $key) {

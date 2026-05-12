@@ -15,9 +15,10 @@ $g = hexdec(substr($sedeColor, 3, 2));
 $b = hexdec(substr($sedeColor, 5, 2));
 $sedeTextColor = (($r * 299 + $g * 587 + $b * 114) / 1000 >= 128) ? '#1a1a1a' : '#ffffff';
 
-$boletasArr  = json_decode($this->boletasJson,  true) ?: [];
-$reservasArr = json_decode($this->reservasJson, true) ?: [];
-$eventoTipo  = $ev->evento_tipo;
+$boletasArr        = json_decode($this->boletasJson,  true) ?: [];
+$reservasArr       = json_decode($this->reservasJson, true) ?: [];
+$eventoTipo        = $ev->evento_tipo;
+$hayBoletasTaquilla = $this->hayBoletasTaquilla ?? false;
 
 // Disponibilidad y precio mínimo según tipo
 $hayDisponible = false;
@@ -439,13 +440,47 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
   </div>
 <?php endif; ?>
 
+<!-- ========== MODAL TAQUILLA ========== -->
+<?php if ($hayBoletasTaquilla): ?>
+<div class="modal fade" id="modalTaquilla" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered ev-taquilla-dialog">
+    <div class="modal-content ev-taquilla-content">
+      <div class="ev-taquilla-header">
+        <div class="ev-taquilla-icon-wrap">
+          <i class="fas fa-store-alt"></i>
+        </div>
+        <button type="button" class="btn-close btn-close-white ev-taquilla-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="ev-taquilla-body">
+        <h5 class="ev-taquilla-title">Entradas disponibles en taquilla</h5>
+        <p class="ev-taquilla-desc">La venta en línea ha cerrado, pero <strong>aún quedan entradas disponibles</strong> para adquirir directamente en el lugar el día del evento.</p>
+        <div class="ev-taquilla-aviso">
+          <i class="fas fa-map-marker-alt"></i>
+          <span><?= ($sede && $sede->sede_nombre) ? "Dirígete a <strong>{$sede->sede_nombre}</strong> y compra tu entrada en taquilla." : 'Dirígete a la sede del evento y compra tu entrada en taquilla.' ?></span>
+        </div>
+      </div>
+      <div class="ev-taquilla-footer">
+        <button type="button" class="ev-taquilla-btn" data-bs-dismiss="modal">
+          <i class="fas fa-check"></i> Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalTaquilla')).show();
+  });
+</script>
+<?php endif; ?>
+
 <!-- ========== MODAL CONFIRMACIÓN DE PAGO ========== -->
 <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered ev-modal-confirm-dialog">
     <div class="modal-content ev-modal-confirm-content">
       <div class="ev-confirm-header">
         <div class="ev-confirm-icon"><i class="fas fa-shield-alt"></i></div>
-        <h5 class="ev-confirm-title">¿Confirmas tu pedido?</h5>
+        <h5 class="ev-confirm-title">¿Confirmas tu compra?</h5>
         <p class="ev-confirm-sub">Al continuar serás redirigido a la pasarela de pago seguro.</p>
       </div>
       <div class="ev-confirm-resumen" id="ev-confirm-resumen"></div>

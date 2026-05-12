@@ -380,6 +380,14 @@ $(document).ready(function () {
     });
   }
 
+  if ($('.select2-tipo-boleta').length) {
+    $('.select2-tipo-boleta').select2({
+      placeholder: 'Seleccione...',
+      allowClear: true,
+      width: '100%'
+    });
+  }
+
   $(".selectpagination").change(function () {
     var route = $("#page-route").val();
     var pages = $(this).val();

@@ -95,8 +95,8 @@ $lugar = $sede ? $sede->sede_nombre : '';
                                             <div
                                               style="color:#636363;font-family:Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;font-size:14px;line-height:150%;text-align:left">
 
-                                              <p style="margin:0 0 16px">Hola, <?= htmlspecialchars($nombre) ?></p>
-                                              <p style="margin:0 0 16px">Hemos terminado de procesar tu pedido.</p>
+                                              <p style="margin:0 0 16px">Hola, <?= ($nombre) ?></p>
+                                              <p style="margin:0 0 16px">Hemos terminado de procesar tu compra.</p>
 
                                               <h2
                                                 style="color:#dc1979;font-family:Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;font-size:18px;font-weight:bold;margin:0 0 18px">
@@ -132,11 +132,11 @@ $lugar = $sede ? $sede->sede_nombre : '';
                                                       <tr>
                                                         <td
                                                           style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left;word-wrap:break-word">
-                                                          <?= htmlspecialchars($nombreEvento) ?>
+                                                          <?= ($nombreEvento) ?>
                                                         </td>
                                                         <td
                                                           style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left">
-                                                          <?= htmlspecialchars($item->detalle_boleta_nombre) ?>
+                                                          <?= ($item->detalle_boleta_nombre) ?>
                                                         </td>
                                                         <td
                                                           style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left">
@@ -165,7 +165,7 @@ $lugar = $sede ? $sede->sede_nombre : '';
                                                       </th>
                                                       <td
                                                         style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left">
-                                                        <?= htmlspecialchars($entidad) ?>
+                                                        <?= ($entidad) ?>
                                                       </td>
                                                     </tr>
                                                     <tr>
@@ -195,12 +195,12 @@ $lugar = $sede ? $sede->sede_nombre : '';
                                                       </h2>
                                                       <address
                                                         style="padding:12px;color:#636363;border:1px solid #e5e5e5;font-style:normal">
-                                                        <?= htmlspecialchars($nombre) ?><br>
-                                                        CC. <?= htmlspecialchars($documento) ?><br>
-                                                        <a href="mailto:<?= htmlspecialchars($email) ?>"
-                                                          target="_blank"><?= htmlspecialchars($email) ?></a>
+                                                        <?= ($nombre) ?><br>
+                                                        CC. <?= ($documento) ?><br>
+                                                        <a href="mailto:<?= ($email) ?>"
+                                                          target="_blank"><?= ($email) ?></a>
                                                         <?php if ($lugar): ?>
-                                                          <br><?= htmlspecialchars($lugar) ?>
+                                                          <br><?= ($lugar) ?>
                                                         <?php endif; ?>
                                                       </address>
                                                     </td>
@@ -235,11 +235,11 @@ $lugar = $sede ? $sede->sede_nombre : '';
                                                       <tr>
                                                         <td
                                                           style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left;word-wrap:break-word">
-                                                          <?= htmlspecialchars($nombreEvento) ?>
+                                                          <?= ($nombreEvento) ?>
                                                         </td>
                                                         <td
                                                           style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left">
-                                                          <?= htmlspecialchars($ticket['boleta_tipo'] ?? 'Boleta') ?>
+                                                          <?= ($ticket['boleta_tipo'] ?? 'Boleta') ?>
                                                         </td>
                                                         <td
                                                           style="color:#636363;border:1px solid #e5e5e5;padding:12px;text-align:left">
@@ -248,7 +248,7 @@ $lugar = $sede ? $sede->sede_nombre : '';
                                                           if (file_exists($ruta)) {
                                                             $rutaEncriptada = urlencode(encryptString($ruta));
                                                             ?>
-                                                            <a href="/page/eventos/leerpdf/?token=<?= $rutaEncriptada ?>"
+                                                            <a href="<?= URL_PROJECT ?>/page/eventos/leerpdf/?token=<?= $rutaEncriptada ?>"
                                                               target="_blank">
                                                               <?= $ticket['ticket_uid'] ?>
                                                             </a>

@@ -89,11 +89,11 @@ if (strpos($_SERVER['HTTP_HOST'], "xovis.omegasolucionesweb.com") !== false) {
 }
 define('APPLICATION_ENV', getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : $env);
 if (APPLICATION_ENV == 'development') {
-  define('RUTA_QR', "http://192.168.150.133:8043");
+  define('URL_PROJECT', "http://192.168.150.133:8043");
 } elseif (APPLICATION_ENV == 'staging') {
-  define('RUTA_QR', "https://newgaleria.galeriacafelibro.com.co");
+  define('URL_PROJECT', "https://newgaleria.galeriacafelibro.com.co");
 } else {
-  define('RUTA_QR', "https://www.galeriacafelibro.com.co");
+  define('URL_PROJECT', "https://www.galeriacafelibro.com.co");
 }
 if (!headers_sent()) {
   $isHttps = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';

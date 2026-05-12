@@ -3407,7 +3407,7 @@ table {
 /* Date badge */
 .evl-card-date {
   position: absolute;
-  top: 14px;
+  bottom: 14px;
   left: 14px;
   display: flex;
   flex-direction: column;
@@ -3658,3 +3658,104 @@ table {
 
 
 }
+/* ── Modal taquilla ───────────────────────────────────────────────────────── */
+.ev-taquilla-dialog { max-width: 400px; }
+
+.ev-taquilla-content {
+  background: #fff;
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+}
+
+.ev-taquilla-header {
+  padding: 28px 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.ev-taquilla-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  filter: invert(1) brightness(.4);
+  opacity: .5;
+}
+.ev-taquilla-close:hover { opacity: .9; }
+
+.ev-taquilla-icon-wrap {
+  width: 60px;
+  height: 60px;
+  background: rgba(11, 75, 62, .08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.55rem;
+  color: var(--brand-verde);
+}
+
+.ev-taquilla-body {
+  padding: 18px 28px 16px;
+  text-align: center;
+}
+
+.ev-taquilla-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 8px;
+  letter-spacing: -.01em;
+}
+
+.ev-taquilla-desc {
+  font-size: .85rem;
+  color: #555;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+.ev-taquilla-desc strong { color: #111; }
+
+.ev-taquilla-aviso {
+  background: rgba(11, 75, 62, .05);
+  border: 1px solid rgba(11, 75, 62, .12);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  text-align: left;
+  font-size: .8rem;
+  color: #444;
+  line-height: 1.55;
+}
+.ev-taquilla-aviso i { color: var(--brand-verde); margin-top: 2px; flex-shrink: 0; }
+.ev-taquilla-aviso strong { color: #111; }
+
+.ev-taquilla-footer {
+  padding: 8px 28px 24px;
+}
+
+.ev-taquilla-btn {
+  width: 100%;
+  padding: 11px;
+  background: var(--brand-verde);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: .88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s, transform .1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  letter-spacing: .01em;
+}
+.ev-taquilla-btn:hover { background: var(--brand-verde-hover); }
+.ev-taquilla-btn:active { transform: scale(.98); }

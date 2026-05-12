@@ -38,8 +38,7 @@ $lugar = $sede ? $sede->sede_nombre : '';
     <td width="50%" align="center" valign="top">
       <img src="file://<?= $docRoot ?>/images_sales/assets/logogaleria.png" width="140" height="140" alt="Logo" />
       <br><br>
-      <img src="file://<?= $docRoot ?>/images/<?= $evento->evento_imagen ?>" alt="<?= $evento->evento_nombre ?>" width="450" height="450"
-        style="border:5px solid #dc1979" />
+      <div style="width:100%;height:450px;background-image:url('file://<?= $docRoot ?>/images/<?= $evento->evento_imagen ?>');background-size:contain;background-position:center;background-repeat:no-repeat;border:5px solid #dc1979;"></div>
     </td>
 
     <!-- Columna derecha -->
@@ -47,10 +46,10 @@ $lugar = $sede ? $sede->sede_nombre : '';
       <br><br>
       <table border="0" cellpadding="6" cellspacing="0" width="100%">
         <tr>
-          <td width="57%">&nbsp;</td>
-          <td width="200"
-            style="background-color:#ffff00;color:#dc1979;font-size:18px;font-weight:bold;text-align:center;">
-            <?= $ticket->ticket_uid ?>
+          <td style="text-align:center;">
+            <span style="background-color:#ffff00;color:#dc1979;font-size:18px;font-weight:bold;padding:4px 12px;display:inline-block;">
+              <?= $ticket->ticket_uid ?>
+            </span>
           </td>
         </tr>
       </table>
@@ -59,11 +58,6 @@ $lugar = $sede ? $sede->sede_nombre : '';
 
       <span style="font-size:14px;font-weight:bold;color:#ffcc00;background:#333;padding:4px 10px;">
         <?= ($tipo) ?>
-      </span>
-      <br><br>
-
-      <span style="font-size:25px;font-weight:bold;color:#fff">
-        <?= ($nombre) ?>
       </span>
       <br><br>
 
@@ -84,7 +78,7 @@ $lugar = $sede ? $sede->sede_nombre : '';
         <br>
       <?php endif; ?>
 
-      <span style="font-size:16px;color:#aaa;">Pedido #<?= $pedidoId ?></span>
+      <span style="font-size:16px;color:#aaa;">Compra #<?= $pedidoId ?></span>
       <br><br>
 
       <table border="0" cellpadding="0" cellspacing="0" width="100%">

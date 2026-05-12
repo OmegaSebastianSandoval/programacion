@@ -1,7 +1,7 @@
 <?php
 /**
-* Controlador de Reservaevento que permite la  creacion, edicion  y eliminacion de los Reservas evento del Sistema
-*/
+ * Controlador de Reservaevento que permite la  creacion, edicion  y eliminacion de los Reservas evento del Sistema
+ */
 class Administracion_reservaeventoController extends Administracion_mainController
 {
 	/**
@@ -20,7 +20,7 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 	 * $pages cantidad de registros a mostrar por pagina]
 	 * @var integer
 	 */
-	protected $pages ;
+	protected $pages;
 
 	/**
 	 * $namefilter nombre de la variable a la fual se le van a guardar los filtros
@@ -43,19 +43,19 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 
 
 	/**
-     * Inicializa las variables principales del controlador reservaevento .
-     *
-     * @return void.
-     */
+	 * Inicializa las variables principales del controlador reservaevento .
+	 *
+	 * @return void.
+	 */
 	public function init()
 	{
 		$this->mainModel = new Administracion_Model_DbTable_Reservaevento();
 		$this->namefilter = "parametersfilterreservaevento";
 		$this->route = "/administracion/reservaevento";
-		$this->namepages ="pages_reservaevento";
-		$this->namepageactual ="page_actual_reservaevento";
+		$this->namepages = "pages_reservaevento";
+		$this->namepageactual = "page_actual_reservaevento";
 		$this->_view->route = $this->route;
-		if(Session::getInstance()->get($this->namepages)){
+		if (Session::getInstance()->get($this->namepages)) {
 			$this->pages = Session::getInstance()->get($this->namepages);
 		} else {
 			$this->pages = 20;
@@ -65,10 +65,10 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 
 
 	/**
-     * Recibe la informacion y  muestra un listado de  Reservas evento con sus respectivos filtros.
-     *
-     * @return void.
-     */
+	 * Recibe la informacion y  muestra un listado de  Reservas evento con sus respectivos filtros.
+	 *
+	 * @return void.
+	 */
 	public function indexAction()
 	{
 		$title = "Administración de Reservas evento";
@@ -109,10 +109,10 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 	}
 
 	/**
-     * Genera la Informacion necesaria para editar o crear un  Reserva  y muestra su formulario
-     *
-     * @return void.
-     */
+	 * Genera la Informacion necesaria para editar o crear un  Reserva  y muestra su formulario
+	 *
+	 * @return void.
+	 */
 	public function manageAction()
 	{
 		$this->_view->route = $this->route;
@@ -149,8 +149,14 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 		$this->_view->evento = $evento;
 
 		$boletaEventoModel = new Administracion_Model_DbTable_Boletaevento();
-		$this->_view->list_boletas = $boletaEventoModel->getList(" boleta_evento_evento = '$reserva_evento_evento' ");
-
+		$boletasModel = new Administracion_Model_DbTable_Boletatipo();
+		$list_boletas = $boletaEventoModel->getList(" boleta_evento_evento = '$reserva_evento_evento' ");
+		foreach ($list_boletas as $b) {
+			$boleta = $boletasModel->getById($b->boleta_evento_tipo);
+			$b->boleta_evento_boleta_nombre = $boleta->boleta_tipo_nombre;
+		}
+		$this->_view->list_boletas = $list_boletas;
+	
 		$reservasExistentes = $this->mainModel->getList(" reserva_evento_evento = '$reserva_evento_evento' ");
 		$cuposUsados = 0;
 		foreach ($reservasExistentes as $r) {
@@ -160,10 +166,10 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 	}
 
 	/**
-     * Inserta la informacion de un Reserva  y redirecciona al listado de Reservas evento.
-     *
-     * @return void.
-     */
+	 * Inserta la informacion de un Reserva  y redirecciona al listado de Reservas evento.
+	 *
+	 * @return void.
+	 */
 	public function insertAction()
 	{
 		$this->setLayout('blanco');
@@ -182,10 +188,10 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 	}
 
 	/**
-     * Recibe un identificador  y Actualiza la informacion de un Reserva  y redirecciona al listado de Reservas evento.
-     *
-     * @return void.
-     */
+	 * Recibe un identificador  y Actualiza la informacion de un Reserva  y redirecciona al listado de Reservas evento.
+	 *
+	 * @return void.
+	 */
 	public function updateAction()
 	{
 		$this->setLayout('blanco');
@@ -208,10 +214,10 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 	}
 
 	/**
-     * Recibe un identificador  y elimina un Reserva  y redirecciona al listado de Reservas evento.
-     *
-     * @return void.
-     */
+	 * Recibe un identificador  y elimina un Reserva  y redirecciona al listado de Reservas evento.
+	 *
+	 * @return void.
+	 */
 	public function deleteAction()
 	{
 		$this->setLayout('blanco');
@@ -236,52 +242,52 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 	}
 
 	/**
-     * Recibe la informacion del formulario y la retorna en forma de array para la edicion y creacion de Reservaevento.
-     *
-     * @return array con toda la informacion recibida del formulario.
-     */
+	 * Recibe la informacion del formulario y la retorna en forma de array para la edicion y creacion de Reservaevento.
+	 *
+	 * @return array con toda la informacion recibida del formulario.
+	 */
 	private function getData()
 	{
 		$data = array();
-		if($this->_getSanitizedParam("reserva_evento_evento") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_evento") == '') {
 			$data['reserva_evento_evento'] = '0';
 		} else {
 			$data['reserva_evento_evento'] = $this->_getSanitizedParam("reserva_evento_evento");
 		}
-		if($this->_getSanitizedParam("reserva_evento_tipo") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_tipo") == '') {
 			$data['reserva_evento_tipo'] = '0';
 		} else {
 			$data['reserva_evento_tipo'] = $this->_getSanitizedParam("reserva_evento_tipo");
 		}
 		$data['reserva_evento_nombre'] = $this->_getSanitizedParam("reserva_evento_nombre");
 		$data['reserva_evento_precio'] = $this->_getSanitizedParam("reserva_evento_precio");
-		if($this->_getSanitizedParam("reserva_evento_capacidad") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_capacidad") == '') {
 			$data['reserva_evento_capacidad'] = '0';
 		} else {
 			$data['reserva_evento_capacidad'] = $this->_getSanitizedParam("reserva_evento_capacidad");
 		}
-		if($this->_getSanitizedParam("reserva_evento_cantidad") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_cantidad") == '') {
 			$data['reserva_evento_cantidad'] = '0';
 		} else {
 			$data['reserva_evento_cantidad'] = $this->_getSanitizedParam("reserva_evento_cantidad");
 		}
-		if($this->_getSanitizedParam("reserva_evento_cantidad_vendidas") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_cantidad_vendidas") == '') {
 			$data['reserva_evento_cantidad_vendidas'] = '0';
 		} else {
 			$data['reserva_evento_cantidad_vendidas'] = $this->_getSanitizedParam("reserva_evento_cantidad_vendidas");
 		}
-		if($this->_getSanitizedParam("reserva_evento_boleta_req") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_boleta_req") == '') {
 			$data['reserva_evento_boleta_req'] = '0';
 		} else {
 			$data['reserva_evento_boleta_req'] = $this->_getSanitizedParam("reserva_evento_boleta_req");
 		}
-		if($this->_getSanitizedParam("reserva_evento_boletas_x_reserva") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_boletas_x_reserva") == '') {
 			$data['reserva_evento_boletas_x_reserva'] = '0';
 		} else {
 			$data['reserva_evento_boletas_x_reserva'] = $this->_getSanitizedParam("reserva_evento_boletas_x_reserva");
 		}
 		$data['reserva_evento_fechalimite'] = $this->_getSanitizedParam("reserva_evento_fechalimite");
-		if($this->_getSanitizedParam("reserva_evento_activo") == '' ) {
+		if ($this->_getSanitizedParam("reserva_evento_activo") == '') {
 			$data['reserva_evento_activo'] = '0';
 		} else {
 			$data['reserva_evento_activo'] = $this->_getSanitizedParam("reserva_evento_activo");
@@ -289,46 +295,46 @@ class Administracion_reservaeventoController extends Administracion_mainControll
 		return $data;
 	}
 	/**
-     * Genera la consulta con los filtros de este controlador.
-     *
-     * @return array cadena con los filtros que se van a asignar a la base de datos
-     */
-    protected function getFilter()
-    {
-    	$filtros = " 1 = 1 ";
-    	$reserva_evento_evento = $this->_getSanitizedParam("reserva_evento_evento");
-    	$filtros .= " AND reserva_evento_evento = '$reserva_evento_evento' ";
-        if (Session::getInstance()->get($this->namefilter) != "") {
-            $filters = (object) Session::getInstance()->get($this->namefilter);
-            if ($filters->reserva_evento_tipo != '') {
-                $filtros .= " AND reserva_evento_tipo = '" . $filters->reserva_evento_tipo . "'";
-            }
-            if ($filters->reserva_evento_nombre != '') {
-                $filtros .= " AND reserva_evento_nombre LIKE '%" . $filters->reserva_evento_nombre . "%'";
-            }
+	 * Genera la consulta con los filtros de este controlador.
+	 *
+	 * @return array cadena con los filtros que se van a asignar a la base de datos
+	 */
+	protected function getFilter()
+	{
+		$filtros = " 1 = 1 ";
+		$reserva_evento_evento = $this->_getSanitizedParam("reserva_evento_evento");
+		$filtros .= " AND reserva_evento_evento = '$reserva_evento_evento' ";
+		if (Session::getInstance()->get($this->namefilter) != "") {
+			$filters = (object) Session::getInstance()->get($this->namefilter);
+			if ($filters->reserva_evento_tipo != '') {
+				$filtros .= " AND reserva_evento_tipo = '" . $filters->reserva_evento_tipo . "'";
+			}
+			if ($filters->reserva_evento_nombre != '') {
+				$filtros .= " AND reserva_evento_nombre LIKE '%" . $filters->reserva_evento_nombre . "%'";
+			}
 		}
-        return $filtros;
-    }
+		return $filtros;
+	}
 
-    /**
-     * Recibe y asigna los filtros de este controlador
-     *
-     * @return void
-     */
-    protected function filters()
-    {
-        if ($this->getRequest()->isPost() == true) {
-        	Session::getInstance()->set($this->namepageactual, 1);
-            $parramsfilter = array();
-            $parramsfilter['reserva_evento_tipo']   = $this->_getSanitizedParam("reserva_evento_tipo");
-            $parramsfilter['reserva_evento_nombre'] = $this->_getSanitizedParam("reserva_evento_nombre");
-            Session::getInstance()->set($this->namefilter, $parramsfilter);
-        }
-        if ($this->_getSanitizedParam("cleanfilter") == 1) {
-            Session::getInstance()->set($this->namefilter, '');
-            Session::getInstance()->set($this->namepageactual, 1);
-        }
-    }
+	/**
+	 * Recibe y asigna los filtros de este controlador
+	 *
+	 * @return void
+	 */
+	protected function filters()
+	{
+		if ($this->getRequest()->isPost() == true) {
+			Session::getInstance()->set($this->namepageactual, 1);
+			$parramsfilter = array();
+			$parramsfilter['reserva_evento_tipo'] = $this->_getSanitizedParam("reserva_evento_tipo");
+			$parramsfilter['reserva_evento_nombre'] = $this->_getSanitizedParam("reserva_evento_nombre");
+			Session::getInstance()->set($this->namefilter, $parramsfilter);
+		}
+		if ($this->_getSanitizedParam("cleanfilter") == 1) {
+			Session::getInstance()->set($this->namefilter, '');
+			Session::getInstance()->set($this->namepageactual, 1);
+		}
+	}
 
 	private function getReservaeventotipo()
 	{
