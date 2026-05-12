@@ -4,7 +4,7 @@
 		<div class="content-dashboard">
 			<div class="row">
 				<div class="col-3">
-					<label>Tipo de zona</label>
+					<label>Tipo de reserva</label>
 					<label class="input-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text input-icono"><i class="far fa-list-alt"></i></span>

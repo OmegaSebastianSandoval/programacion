@@ -151,7 +151,7 @@
 						<td>Vendidas</td>
 						<td>Evento</td>
 						<td>Precio</td>
-						<td>Valor adicional(Precio reserva)</td>
+						<td>Precio adicional (Servicio)</td>
 						<td>Fecha l&iacute;mite</td>
 						<td width="150"></td>
 					</tr>
@@ -165,7 +165,7 @@
 							<td><?= (int) $content->boleta_evento_cantidad_vendidas; ?></td>
 							<td><?= $this->list_evento[$content->boleta_evento_evento] ?></td>
 							<td><?= $content->boleta_evento_precio; ?></td>
-							<td><?= $content->boleta_evento_precioreserva; ?></td>
+							<td><?= $content->boleta_evento_precioadicional; ?></td>
 							<td><?= $content->boleta_evento_fechalimite; ?></td>
 							<td class="text-end">
 								<div>

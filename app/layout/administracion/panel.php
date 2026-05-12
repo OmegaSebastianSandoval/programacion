@@ -21,6 +21,8 @@
   <link rel="stylesheet" href="/components/Font-Awesome/css/all.css">
   <!-- Colorpicker -->
   <link rel="stylesheet" href="/components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css">
+  <!-- Select2 -->
+  <link rel="stylesheet" href="/components/select2/css/select2.min.css">
   <!-- Global CSS -->
   <link rel="stylesheet" href="/skins/administracion/css/global.css">
   <link rel="shortcut icon" href="/images/<?= $infopage->info_pagina_favicon; ?>">
@@ -69,6 +71,8 @@
   <!-- CKEditor 5 -->
   <script src="/components/ckeditor5/ckeditor.js"></script>
 
+  <!-- Select2 -->
+  <script src="/components/select2/js/select2.min.js"></script>
   <!-- main Js -->
   <script src="/skins/administracion/js/main.js"></script>
   <?php include APP_PATH . 'layout/partials/cookies-consent.php'; ?>

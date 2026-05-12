@@ -128,19 +128,19 @@
 				<?php } ?>
 				<?php if (in_array($tipoEvento, ['reservayboleteria', 'reserva'])) { ?>
 					<div class="col-12  col-lg-3 form-group">
-						<label for="boleta_evento_precioreserva_display" class="control-label">Precio reserva <span
+						<label for="boleta_evento_precioadicional_display" class="control-label">Precio servicio <span
 								class="text-muted">(Valor adicional)</span></label>
 						<label class="input-group">
 							<div class="input-group-prepend">
 								<span class="input-group-text input-icono "><i class="fas fa-pencil-alt"></i></span>
 							</div>
-							<input type="text" id="boleta_evento_precioreserva_display" class="form-control precio-cop"
-								data-hidden="boleta_evento_precioreserva"
-								value="<?= $this->content->boleta_evento_precioreserva ? number_format((int) $this->content->boleta_evento_precioreserva, 0, ',', '.') : ''; ?>"
+							<input type="text" id="boleta_evento_precioadicional_display" class="form-control precio-cop"
+								data-hidden="boleta_evento_precioadicional"
+								value="<?= $this->content->boleta_evento_precioadicional ? number_format((int) $this->content->boleta_evento_precioadicional, 0, ',', '.') : ''; ?>"
 								autocomplete="off" required>
 						</label>
-						<input type="hidden" name="boleta_evento_precioreserva" id="boleta_evento_precioreserva"
-							value="<?= $this->content->boleta_evento_precioreserva; ?>">
+						<input type="hidden" name="boleta_evento_precioadicional" id="boleta_evento_precioadicional"
+							value="<?= $this->content->boleta_evento_precioadicional; ?>">
 						<div class="help-block with-errors"></div>
 					</div>
 				<?php } ?>

@@ -4,6 +4,8 @@
 */
 class Administracion_vendedoresController extends Administracion_mainController
 {
+  public $botonpanel = 9;
+
 	/**
 	 * $mainModel  instancia del modelo de  base de datos vendedores
 	 * @var modeloContenidos

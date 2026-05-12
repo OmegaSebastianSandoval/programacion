@@ -43,10 +43,22 @@
       Administrar tipos de boletas
     </a>
   </li>
-    <li <?php if ($this->botonpanel == 8) { ?>class="activo" <?php } ?>>
+    <li <?php if ($this->botonpanel == 9) { ?>class="activo" <?php } ?>>
     <a href="/administracion/vendedores">
       <i class="fas fa-ticket-alt"></i>
       Administrar vendedores
+    </a>
+  </li>
+      <li <?php if ($this->botonpanel == 10) { ?>class="activo" <?php } ?>>
+    <a href="/administracion/reservas">
+      <i class="fas fa-calendar-check"></i>
+      Administrar reservas
+    </a>
+  </li>
+  <li <?php if ($this->botonpanel == 11) { ?>class="activo" <?php } ?>>
+    <a href="/administracion/compras">
+      <i class="fas fa-receipt"></i>
+      Administrar compras
     </a>
   </li>
   <?php if (Session::getInstance()->get('kt_login_level') == '1') { ?>

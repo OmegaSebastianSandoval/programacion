@@ -372,6 +372,14 @@ $(document).ready(function () {
     }
   });
 
+  if ($('.select2-eventos').length) {
+    $('.select2-eventos').select2({
+      placeholder: '— Todos los eventos —',
+      allowClear: true,
+      width: '100%'
+    });
+  }
+
   $(".selectpagination").change(function () {
     var route = $("#page-route").val();
     var pages = $(this).val();
