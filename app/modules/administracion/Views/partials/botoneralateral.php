@@ -61,6 +61,12 @@
       Administrar compras
     </a>
   </li>
+  <li <?php if ($this->botonpanel == 12) { ?>class="activo" <?php } ?>>
+    <a href="/administracion/metricas">
+      <i class="fas fa-chart-line"></i>
+      Dashboard de Eventos
+    </a>
+  </li>
   <?php if (Session::getInstance()->get('kt_login_level') == '1') { ?>
     <li <?php if ($this->botonpanel == 4) { ?>class="activo" <?php } ?>>
       <a href="/administracion/usuario">

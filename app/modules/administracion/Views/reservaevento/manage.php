@@ -142,6 +142,7 @@
 						<input type="text" class="form-control bg-light"
 							value="<?= (int)$this->content->reserva_evento_cantidad_vendidas; ?>" disabled>
 					</label>
+					<input type="hidden" name="reserva_evento_cantidad_vendidas" value="<?= (int)$this->content->reserva_evento_cantidad_vendidas; ?>">
 				</div>
 				<?php else: ?>
 					<input type="hidden" name="reserva_evento_cantidad_vendidas" value="0">

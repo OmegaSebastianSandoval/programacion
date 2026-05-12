@@ -474,6 +474,15 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
 </script>
 <?php endif; ?>
 
+<!-- ========== OVERLAY DE PROCESAMIENTO ========== -->
+<div id="ev-procesando-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,15,20,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;">
+  <div style="width:48px;height:48px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:ev-spin .75s linear infinite;"></div>
+  <p style="color:#fff;font-size:.95rem;letter-spacing:.03em;margin:0;opacity:.85;">Procesando tu pago…</p>
+</div>
+<style>
+  @keyframes ev-spin { to { transform: rotate(360deg); } }
+</style>
+
 <!-- ========== MODAL CONFIRMACIÓN DE PAGO ========== -->
 <div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered ev-modal-confirm-dialog">
@@ -579,6 +588,8 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
         document.body.appendChild(pendingForm);
         const f = pendingForm;
         pendingForm = null;
+        const overlay = document.getElementById('ev-procesando-overlay');
+        if (overlay) overlay.style.display = 'flex';
         f.submit();
       });
     }
