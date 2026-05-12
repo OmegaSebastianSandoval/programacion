@@ -163,6 +163,7 @@ table {
 .global-navbar {
   min-height: var(--global-header-height);
   border-bottom: 3px solid var(--brand-amarillo);
+  padding: 0;
 }
 
 .global-navbar .nav-link {
@@ -2536,13 +2537,13 @@ table {
 
   .ev-info-inner {
     padding: 1.5rem 1.25rem 1rem;
-    margin: 1rem 1rem 0;
+    margin: 0;
     border-radius: 14px;
   }
 
   .ev-info-cta {
     padding: .9rem 1.25rem;
-    margin: .75rem 1rem 1.25rem;
+    margin: .75rem 0 0 0;
     border-radius: 14px;
   }
 }
@@ -2555,7 +2556,7 @@ table {
 
   .ev-info-inner {
     padding: 1.25rem 1rem .75rem;
-    margin: .75rem .75rem 0;
+    margin: 0;
     border-radius: 12px;
   }
 
@@ -2566,7 +2567,7 @@ table {
   .ev-info-cta {
     padding: .75rem 1rem;
     gap: .75rem;
-    margin: .6rem .75rem 1rem;
+    margin: .5rem 0 0 0;
     border-radius: 12px;
   }
 
@@ -2588,6 +2589,14 @@ table {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+
+  .ev-btn-cta {
+    font-size: .6rem;
+  }
+.ev-politicas-footer{
+  flex-direction: column;
+  align-items: stretch;
+}
 }
 
 /* ========== MODAL CONFIRMACIÓN DE PAGO ========== */
@@ -2700,7 +2709,7 @@ table {
   border-radius: 50px;
   background: linear-gradient(135deg, var(--brand-verde) 0%, #0f6b56 100%);
   color: #fff;
-  font-size: .88rem;
+  font-size: .68rem;
   font-weight: 800;
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -2855,8 +2864,8 @@ table {
 }
 
 .resp-card-header-title {
-  font-family: 'Cormorant', Georgia, serif;
-  font-size: 1.05rem;
+  /* font-family: 'Cormorant', Georgia, serif; */
+  font-size: 1.5rem;
   font-weight: 600;
   color: #fff;
   margin: 0;
@@ -3647,7 +3656,5 @@ table {
     gap: .85rem;
   }
 
-  .evl-card-media {
-    padding-bottom: 100%;
-  }
+
 }

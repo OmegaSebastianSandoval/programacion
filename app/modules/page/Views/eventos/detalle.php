@@ -166,7 +166,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
                   <div class="ev-info-boleta-precios">
                     <span class="ev-info-boleta-precio">$ <?= number_format($bItem['precio'], 0, ',', '.') ?></span>
                     <?php if ($eventoTipo === 'reservayboleteria' && $bItem['precioadicional'] > 0): ?>
-                      <span class="ev-info-boleta-precio-reserva">+ Reserva $ <?= number_format($bItem['precioadicional'], 0, ',', '.') ?></span>
+                      <span class="ev-info-boleta-precio-reserva">+ Servicio $ <?= number_format($bItem['precioadicional'], 0, ',', '.') ?></span>
                     <?php endif; ?>
                   </div>
                 </div>
@@ -291,11 +291,11 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
             <div class="ev-form-grid">
               <div class="ev-form-group ev-form-group--full">
                 <label>Nombre completo</label>
-                <input type="text" class="ev-input" id="comp-nombre" placeholder="Tu nombre completo" required>
+                <input type="text" class="ev-input" id="comp-nombre" placeholder="Juan Pérez" required>
               </div>
               <div class="ev-form-group">
                 <label>Documento</label>
-                <input type="text" class="ev-input" id="comp-documento" placeholder="Número de doc." required>
+                <input type="text" class="ev-input" id="comp-documento" placeholder="1234567" required>
               </div>
               <div class="ev-form-group">
                 <label>Fecha de nacimiento</label>
@@ -472,6 +472,55 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
 
     const formatCOP = n => (n === 0 ? 'Gratis' : '$ ' + Math.round(n).toLocaleString('es-CO'));
 
+    // ── Restricciones y filtros de campos del comprador ──────────────────────
+    const nacimientoInput = document.getElementById('comp-nacimiento');
+    if (nacimientoInput) {
+      const hoy = new Date();
+      const maxFecha = new Date(hoy.getFullYear() - 15, hoy.getMonth(), hoy.getDate());
+      const minFecha = new Date(hoy.getFullYear() - 120, hoy.getMonth(), hoy.getDate());
+      nacimientoInput.max = maxFecha.toISOString().split('T')[0];
+      nacimientoInput.min = minFecha.toISOString().split('T')[0];
+    }
+
+    const nombreInput = document.getElementById('comp-nombre');
+    if (nombreInput) {
+      nombreInput.addEventListener('input', () => {
+        nombreInput.value = nombreInput.value.replace(/[0-9]/g, '');
+      });
+    }
+
+    const documentoInput = document.getElementById('comp-documento');
+    if (documentoInput) {
+      documentoInput.addEventListener('input', () => {
+        documentoInput.value = documentoInput.value.replace(/\D/g, '');
+      });
+    }
+
+    function validarComprador() {
+      const nombre     = document.getElementById('comp-nombre').value.trim();
+      const documento  = document.getElementById('comp-documento').value.trim();
+      const nacimiento = document.getElementById('comp-nacimiento').value.trim();
+      const email      = document.getElementById('comp-email').value.trim();
+
+      if (!nombre || !documento || !nacimiento || !email)
+        return 'Completa todos los datos del comprador.';
+      if (/[0-9]/.test(nombre))
+        return 'El nombre no debe contener números.';
+      if (!/^\d+$/.test(documento))
+        return 'El documento debe contener solo números.';
+
+      const hoy = new Date();
+      const limite = new Date(hoy.getFullYear() - 15, hoy.getMonth(), hoy.getDate());
+      const fechaNac = new Date(nacimiento + 'T00:00:00');
+      if (isNaN(fechaNac.getTime()) || fechaNac > limite)
+        return 'Debes tener al menos 15 años para realizar una compra.';
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return 'Ingresa un correo electrónico válido.';
+
+      return null;
+    }
+
     // ── Modal de confirmación ────────────────────────────────────────────────
     let pendingForm = null;
 
@@ -630,20 +679,15 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
       recalcular();
 
       document.getElementById('ev-btn-comprar').addEventListener('click', () => {
+        const errorComprador = validarComprador();
+        if (errorComprador) { mostrarErrorInline(errorComprador); return; }
+
         const nombre = document.getElementById('comp-nombre').value.trim();
         const documento = document.getElementById('comp-documento').value.trim();
         const nacimiento = document.getElementById('comp-nacimiento').value.trim();
         const email = document.getElementById('comp-email').value.trim();
         const vendedor = document.getElementById('comp-vendedor').value.trim();
 
-        if (!nombre || !documento || !nacimiento || !email) {
-          mostrarErrorInline('Completa todos los datos del comprador.');
-          return;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          mostrarErrorInline('Ingresa un correo electrónico válido.');
-          return;
-        }
         if (!reservaSelId) {
           mostrarErrorInline('Selecciona una opción de reserva.');
           return;
@@ -708,7 +752,7 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
           if (EVENTO_TIPO === 'reservayboleteria' && b.precioadicional > 0) {
             precioHtml = `<span class="ev-chip-precio-detalle">` +
               `<span>Boleta: ${formatCOP(b.precio)}</span>` +
-              `<span>Reserva: ${formatCOP(b.precioadicional)}</span>` +
+              `<span>Servicio: ${formatCOP(b.precioadicional)}</span>` +
               `<strong>Total c/u: ${formatCOP(b.precio + b.precioadicional)}</strong></span>`;
           } else {
             precioHtml = `<span class="ev-chip-precio">${formatCOP(b.precio)}</span>`;
@@ -890,6 +934,9 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
       recalcular();
 
       document.getElementById('ev-btn-comprar').addEventListener('click', () => {
+        const errorComprador = validarComprador();
+        if (errorComprador) { mostrarErrorInline(errorComprador); return; }
+
         const nombre = document.getElementById('comp-nombre').value.trim();
         const documento = document.getElementById('comp-documento').value.trim();
         const nacimiento = document.getElementById('comp-nacimiento').value.trim();
@@ -897,15 +944,6 @@ $btnTexto = ($eventoTipo === 'reserva') ? 'Hacer reserva' : 'Comprar entradas';
         const vendedor = document.getElementById('comp-vendedor').value.trim();
         const codigoEl = document.getElementById('promo-codigo');
         const codigo = codigoEl ? codigoEl.value.trim() : '';
-
-        if (!nombre || !documento || !nacimiento || !email) {
-          mostrarErrorInline('Completa todos los datos del comprador.');
-          return;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          mostrarErrorInline('Ingresa un correo electrónico válido.');
-          return;
-        }
 
         const boletas = [];
         let subtotal = 0;

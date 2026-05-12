@@ -98,7 +98,7 @@ class Page_eventosController extends Page_mainController
           'saldo' => (int) $b->boleta_evento_saldo,
           'disponibles' => $disponibles,
           'precio' => (float) $b->boleta_evento_precio,
-          'precioadicional' => (float) $b->boleta_evento_precioreserva,
+          'precioadicional' => (float) $b->boleta_evento_precioadicional,
           'fechalimite' => $b->boleta_evento_fechalimite,
         ];
       }
@@ -253,7 +253,7 @@ class Page_eventosController extends Page_mainController
 
       $totalCalculado = (float) $reservaEvento->reserva_evento_precio * $cantidadPersonas;
       $cantidadTotal = $cantidadPersonas;
-      $descripcion = 'Reserva ' . $cantidadPersonas . ' persona(s) — ' . $evento->evento_nombre;
+      $descripcion = 'Reserva: ' . $reservaEvento->reserva_evento_nombre . ' · ' . $cantidadPersonas . ' persona(s) — ' . $evento->evento_nombre;
 
       $this->aplicarPromo($codigo, $eventoId, $totalCalculado, $descuento, $promoId);
       $totalFinal = max(0, $totalCalculado - $descuento);
@@ -430,7 +430,7 @@ class Page_eventosController extends Page_mainController
         ]);
       }
 
-      $descripcion = 'Compra ' . $cantidadTotal . ' boleta(s)' . ($reservaEvento ? ' + palco' : '') . ' — ' . $evento->evento_nombre;
+      $descripcion = 'Compra ' . $cantidadTotal . ' boleta(s)' . ($reservaEvento ? ' + Reserva: ' . $reservaEvento->reserva_evento_nombre : '') . ' — ' . $evento->evento_nombre;
 
     } else {
       $redirectError('Tipo de evento no reconocido.');
@@ -573,7 +573,7 @@ class Page_eventosController extends Page_mainController
       }
 
       $precioUnit = (float) $boleta->boleta_evento_precio;
-      $precioReserva = ($evento->evento_tipo === 'reservayboleteria') ? (float) $boleta->boleta_evento_precioreserva : 0;
+      $precioReserva = ($evento->evento_tipo === 'reservayboleteria') ? (float) $boleta->boleta_evento_precioadicional : 0;
 
       $totalCalculado += ($precioUnit + $precioReserva) * $cantidad;
       $cantidadTotal += $cantidad;
@@ -661,6 +661,37 @@ class Page_eventosController extends Page_mainController
         $reEvModel->editField($reserva->reserva_evento_id_fk, 'reserva_evento_cantidad_vendidas', $nuevaCantidad);
       }
     }
+  }
+
+  private function notificarReversion($compra)
+  {
+    $this->setLayout('blanco');
+    if (!$compra) {
+      return;
+    }
+
+    $evento = null;
+    $sede = null;
+    if ($compra->boleta_compra_evento) {
+      $evento = (new Administracion_Model_DbTable_Eventos())->getById($compra->boleta_compra_evento);
+      if ($evento && $evento->evento_lugar) {
+        $sede = (new Administracion_Model_DbTable_Sedes())->getById($evento->evento_lugar);
+      }
+    }
+
+    $detalle = (new Administracion_Model_DbTable_Compradetalle())->getList("detalle_compra = '{$compra->boleta_compra_id}'");
+    $reserva = (new Administracion_Model_DbTable_Reservas())->getByCompraId($compra->boleta_compra_id);
+
+    $epaycoData = [
+      'x_response_reason_text' => $_REQUEST['x_response_reason_text'] ?? '',
+      'x_transaction_state' => $_REQUEST['x_transaction_state'] ?? 'Reversada',
+      'x_ref_payco' => $_REQUEST['x_ref_payco'] ?? '',
+      'x_amount' => $_REQUEST['x_amount'] ?? '',
+      'x_bank_name' => $_REQUEST['x_bank_name'] ?? '',
+    ];
+
+    $email = new Core_Model_Sendingemail($this->_view);
+    $email->enviarCorreoReversada($compra, $evento, $sede, $detalle, $reserva, $epaycoData);
   }
 
   public function states()
@@ -993,6 +1024,8 @@ class Page_eventosController extends Page_mainController
             }
           }
 
+          $this->notificarReversion($compraExistente ?: $comprasModel->getById($idCompra));
+
           break;
       }
     } else {
@@ -1229,3 +1262,5 @@ class Page_eventosController extends Page_mainController
 // body:"Server error: `GET https://rdbd9vcd-8043.use2.devtunnels.ms/page/eventos/confirmacion?x_cust_id_cliente=1264217&x_ref_payco=364251404&x_id_factura=1&x_id_invoice=1&x_description=Compra%203%20boleta%28s%29%20%C3%A2%C2%80%C2%94%20Test%20reserva%20y%20boleteria&x_amount=106000&x_amount_country=106000&x_amount_ok=106000&x_tax=0&x_amount_base=0&x_currency_code=COP&x_bank_name=BANCO%20DE%20PRUEBAS&x_cardnumber=457562%2A%2A%2A%2A%2A%2A%2A0326&x_quotas=1&x_respuesta=Rechazada&x_response=Rechazada&x_approval_code=000000&x_transaction_id=364251404&x_fecha_transaccion=2026-05-05%2016%3A36%3A14&x_transaction_date=2026-05-05%2016%3A36%3A14&x_cod_respuesta=2&x_cod_response=2&x_response_reason_text=04-Tarjeta%20restringida%20por%20el%20centro%20de%20autorizaciones&x_errorcode=04&x_cod_transaction_state=2&x_transaction_state=Rechazada&x_franchise=VS&x_payment_method=VS&x_business=Galeria%20Cafe%20Libro%20Club%20Social%20Privado%20SAS&x_customer_doctype=CC&x_customer_document=123123123&x_customer_name=Test&x_customer_lastname=nombre&x_customer_email=test%40test.com&x_customer_phone=3123123121&x_customer_movil=3123123121&x_customer_ind_pais=&x_customer_country=CO&x_customer_city=Bogota&x_customer_address=cll%202%20%2023-33&x_customer_ip=45.173.12.208&x_test_request=FALSE&x_extra1=1&x_extra2=3&x_extra3=1&x_extra4=testing123&x_extra5=&x_extra6=&x_extra7=&x_extra8=&x_extra9=&x_extra10=&x_tax_ico=0&x_payment_date=&x_signature=a02667c50d960df5d06489991833fec9489cf72c6474f4fe4ec259d76d180867&x_transaction_cycle=&is_processable=1&x_manual=1` resulted in a `502 Bad Gateway` response",
 // url:"https://rdbd9vcd-8043.use2.devtunnels.ms/page/eventos/confirmacion",
 // }
+
+// http://localhost:8043/page/eventos/notificarReversion?x_cust_id_cliente=1264217&x_ref_payco=364251404&x_id_factura=1&x_id_invoice=1&x_description=Compra%203%20boleta%28s%29%20%C3%A2%C2%80%C2%94%20Test%20reserva%20y%20boleteria&x_amount=106000&x_amount_country=106000&x_amount_ok=106000&x_tax=0&x_amount_base=0&x_currency_code=COP&x_bank_name=BANCO%20DE%20PRUEBAS&x_cardnumber=457562%2A%2A%2A%2A%2A%2A%2A0326&x_quotas=1&x_respuesta=Rechazada&x_response=Rechazada&x_approval_code=000000&x_transaction_id=364251404&x_fecha_transaccion=2026-05-05%2016%3A36%3A14&x_transaction_date=2026-05-05%2016%3A36%3A14&x_cod_respuesta=2&x_cod_response=2&x_response_reason_text=04-Tarjeta%20restringida%20por%20el%20centro%20de%20autorizaciones&x_errorcode=04&x_cod_transaction_state=2&x_transaction_state=Rechazada&x_franchise=VS&x_payment_method=VS&x_business=Galeria%20Cafe%20Libro%20Club%20Social%20Privado%20SAS&x_customer_doctype=CC&x_customer_document=123123123&x_customer_name=Test&x_customer_lastname=nombre&x_customer_email=test%40test.com&x_customer_phone=3123123121&x_customer_movil=3123123121&x_customer_ind_pais=&x_customer_country=CO&x_customer_city=Bogota&x_customer_address=cll%202%20%2023-33&x_customer_ip=45.173.12.208&x_test_request=FALSE&x_extra1=1&x_extra2=3&x_extra3=1&x_extra4=testing123&x_extra5=&x_extra6=&x_extra7=&x_extra8=&x_extra9=&x_extra10=&x_tax_ico=0&x_payment_date=&x_signature=a02667c50d960df5d06489991833fec9489cf72c6474f4fe4ec259d76d180867&x_transaction_cycle=&is_processable=1&x_manual=1

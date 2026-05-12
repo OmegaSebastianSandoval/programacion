@@ -89,6 +89,38 @@ class Core_Model_Sendingemail
     }
   }
 
+  public function enviarCorreoReversada($compra, $evento, $sede, $detalle, $reserva, $epaycoData)
+  {
+    $this->_view->compra = $compra;
+    $this->_view->evento = $evento;
+    $this->_view->sede = $sede;
+    $this->_view->detalle = $detalle;
+    $this->_view->reserva = $reserva;
+    $this->_view->epaycoData = $epaycoData;
+
+    $informacionModel = new Page_Model_DbTable_Informacion();
+    $informacion = $informacionModel->getList("", "orden ASC")[0];
+    $correo = $informacion->info_pagina_correos_contacto;
+    $email = $compra->boleta_compra_email;
+    $nombre = $compra->boleta_compra_nombre;
+
+    if (APPLICATION_ENV == 'production') {
+      $this->email->getMail()->addBCC($correo, "Reversión Galeria Cafe Libro");
+      $this->email->getMail()->addAddress($email, $nombre);
+    }
+    $this->email->getMail()->addBCC("desarrollo8@omegawebsystems.com", "Reversión Galeria Cafe Libro");
+
+    $content = $this->_view->getRoutPHP('/../app/modules/core/Views/templatesemail/correo_reversada.php');
+    $this->email->getMail()->Subject = "Transacción reversada — Galería Café Libro";
+    $this->email->getMail()->msgHTML($content);
+    $this->email->getMail()->AltBody = $content;
+    if ($this->email->sed() == true) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
   public function generarCorreoBoleteria($infoVenta, $qrsGenerados)
   {
 

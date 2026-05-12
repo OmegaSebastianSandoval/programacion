@@ -28,10 +28,10 @@ class Administracion_Model_DbTable_Boletaevento extends Db_Table
 		$boleta_evento_saldo = $data['boleta_evento_saldo'];
 		$boleta_evento_evento = $data['boleta_evento_evento'];
 		$boleta_evento_precio = $data['boleta_evento_precio'];
-		$boleta_evento_precioreserva = $data['boleta_evento_precioreserva'];
+		$boleta_evento_precioadicional = $data['boleta_evento_precioadicional'];
 		$boleta_evento_fechalimite = $data['boleta_evento_fechalimite'];
 		$boleta_evento_horalimite = $data['boleta_evento_horalimite'];
-		$query = "INSERT INTO boleta_evento( boleta_evento_tipo, boleta_evento_cantidad, boleta_evento_saldo, boleta_evento_evento, boleta_evento_precio, boleta_evento_precioreserva, boleta_evento_fechalimite, boleta_evento_horalimite, boleta_evento_cantidad_vendidas) VALUES ( '$boleta_evento_tipo', '$boleta_evento_cantidad', '$boleta_evento_saldo', '$boleta_evento_evento', '$boleta_evento_precio', '$boleta_evento_precioreserva', '$boleta_evento_fechalimite', '$boleta_evento_horalimite', '0')";
+		$query = "INSERT INTO boleta_evento( boleta_evento_tipo, boleta_evento_cantidad, boleta_evento_saldo, boleta_evento_evento, boleta_evento_precio, boleta_evento_precioadicional, boleta_evento_fechalimite, boleta_evento_horalimite, boleta_evento_cantidad_vendidas) VALUES ( '$boleta_evento_tipo', '$boleta_evento_cantidad', '$boleta_evento_saldo', '$boleta_evento_evento', '$boleta_evento_precio', '$boleta_evento_precioadicional', '$boleta_evento_fechalimite', '$boleta_evento_horalimite', '0')";
 		$res = $this->_conn->query($query);
 		return mysqli_insert_id($this->_conn->getConnection());
 	}
@@ -50,10 +50,10 @@ class Administracion_Model_DbTable_Boletaevento extends Db_Table
 		$boleta_evento_saldo = $data['boleta_evento_saldo'];
 		$boleta_evento_evento = $data['boleta_evento_evento'];
 		$boleta_evento_precio = $data['boleta_evento_precio'];
-		$boleta_evento_precioreserva = $data['boleta_evento_precioreserva'];
+		$boleta_evento_precioadicional = $data['boleta_evento_precioadicional'];
 		$boleta_evento_fechalimite = $data['boleta_evento_fechalimite'];
 		$boleta_evento_horalimite = $data['boleta_evento_horalimite'];
-		$query = "UPDATE boleta_evento SET  boleta_evento_tipo = '$boleta_evento_tipo', boleta_evento_cantidad = '$boleta_evento_cantidad', boleta_evento_saldo = '$boleta_evento_saldo', boleta_evento_evento = '$boleta_evento_evento', boleta_evento_precio = '$boleta_evento_precio', boleta_evento_precioreserva = '$boleta_evento_precioreserva', boleta_evento_fechalimite = '$boleta_evento_fechalimite', boleta_evento_horalimite = '$boleta_evento_horalimite' WHERE boleta_evento_id = '" . $id . "'";
+		$query = "UPDATE boleta_evento SET  boleta_evento_tipo = '$boleta_evento_tipo', boleta_evento_cantidad = '$boleta_evento_cantidad', boleta_evento_saldo = '$boleta_evento_saldo', boleta_evento_evento = '$boleta_evento_evento', boleta_evento_precio = '$boleta_evento_precio', boleta_evento_precioadicional = '$boleta_evento_precioadicional', boleta_evento_fechalimite = '$boleta_evento_fechalimite', boleta_evento_horalimite = '$boleta_evento_horalimite' WHERE boleta_evento_id = '" . $id . "'";
 		$res = $this->_conn->query($query);
 	}
 }
